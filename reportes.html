@@ -8,308 +8,387 @@
         :root {
             --color-primario: #701321;
             --color-primario-light: #8e1a2a;
+            --color-primario-dark: #4d0d17;
             --color-oro: #b38e1d;
             --color-oro-brillante: #d4af37;
             --color-oro-suave: #F4E4C1;
             --texto-oscuro: #2d0a0a;
-            --sombra-suave: 0 8px 20px rgba(0,0,0,0.1);
-            --sombra-fuerte: 0 12px 30px rgba(112,19,33,0.2);
+            --sidebar-w: 300px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: radial-gradient(circle at center, #ffffff 0%, #f0f0f0 100%);
-            color: var(--texto-oscuro);
-            min-height: 100vh;
-            padding: 28px 20px 40px;
-        }
-
-        .container {
-            max-width: 860px;
-            margin: 0 auto;
-        }
-
-        /* ── Header ── */
-        .header { text-align: center; margin-bottom: 40px; }
-        .header h1 {
-            font-size: 2rem;
-            letter-spacing: 3px;
-            color: var(--color-primario);
-            text-transform: uppercase;
-            border-bottom: 3px solid var(--color-oro);
-            padding-bottom: 12px;
-            display: inline-block;
-        }
-        .header p {
-            margin-top: 14px;
-            font-size: 0.9rem;
-            color: #777;
-        }
-
-        /* ── Tipo de reporte (Semanal / Mensual) ── */
-        .tipo-bloque { margin-bottom: 28px; }
-
-        .tipo-btn {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--color-primario);
-            color: var(--color-oro-brillante);
-            border: none;
-            padding: 18px 24px;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            cursor: pointer;
-            text-align: left;
-            box-shadow: var(--sombra-suave);
-            transition: background 0.3s, box-shadow 0.3s;
-        }
-        .tipo-btn:hover {
-            background: var(--color-primario-light);
-            box-shadow: var(--sombra-fuerte);
-        }
-        .tipo-btn.open {
-            border-radius: 16px 16px 0 0;
-        }
-        .tipo-btn .chevron {
-            width: 22px;
-            height: 22px;
-            fill: none;
-            stroke: var(--color-oro-brillante);
-            stroke-width: 2.5;
-            transition: transform 0.3s ease;
-            flex-shrink: 0;
-        }
-        .tipo-btn.open .chevron { transform: rotate(180deg); }
-
-        .tipo-body {
-            display: none;
-            background: white;
-            border: 2px solid var(--color-primario);
-            border-top: none;
-            border-radius: 0 0 16px 16px;
-            padding: 0;
+            background: #f0f0f0;
+            height: 100vh;
             overflow: hidden;
-            box-shadow: var(--sombra-suave);
+            display: flex;
+            flex-direction: column;
         }
-        .tipo-body.open { display: block; }
 
-        /* ── Mes (sub-acordeón) ── */
-        .mes-bloque { border-bottom: 1px solid #f0e8d0; }
-        .mes-bloque:last-child { border-bottom: none; }
+        /* ── Top bar ── */
+        .topbar {
+            background: var(--color-primario-dark);
+            color: var(--color-oro-brillante);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        .topbar-title {
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .topbar-subtitle {
+            font-size: 0.75rem;
+            color: rgba(212,175,55,0.7);
+            margin-top: 1px;
+        }
+        .topbar-logo {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--color-oro-brillante);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--color-oro-brillante);
+            letter-spacing: -1px;
+        }
 
-        .mes-btn {
-            width: 100%;
+        /* ── Hamburger (mobile) ── */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .hamburger svg { width: 24px; height: 24px; stroke: var(--color-oro-brillante); stroke-width: 2; fill: none; }
+
+        /* ── Main layout ── */
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--color-primario);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: var(--color-primario-dark); }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--color-oro); border-radius: 4px; }
+
+        /* Tipo section (Semanal / Mensual) */
+        .tipo-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--color-oro-suave);
-            border: none;
-            padding: 14px 24px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--color-primario);
+            padding: 14px 20px;
             cursor: pointer;
-            text-align: left;
+            user-select: none;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
             transition: background 0.2s;
         }
-        .mes-btn:hover { background: #ecd89a; }
-        .mes-btn .chevron-sm {
-            width: 16px;
-            height: 16px;
-            fill: none;
-            stroke: var(--color-primario);
-            stroke-width: 2.5;
+        .tipo-header:hover { background: var(--color-primario-light); }
+        .tipo-header span {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--color-oro-brillante);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .tipo-header .arrow {
+            width: 14px; height: 14px;
+            fill: none; stroke: var(--color-oro-brillante); stroke-width: 2.5;
             transition: transform 0.3s;
             flex-shrink: 0;
         }
-        .mes-btn.open .chevron-sm { transform: rotate(180deg); }
+        .tipo-header.open .arrow { transform: rotate(180deg); }
 
-        .mes-body {
-            display: none;
-            padding: 16px 24px 20px;
-            background: white;
-        }
-        .mes-body.open { display: block; }
+        .tipo-content { display: none; }
+        .tipo-content.open { display: block; }
 
-        /* ── Tarjeta de reporte individual ── */
-        .reporte-card {
+        /* Mes header */
+        .mes-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #fdf9f2;
-            border: 1px solid #e8d5a0;
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-bottom: 10px;
-            transition: box-shadow 0.2s, border-color 0.2s;
+            padding: 10px 20px 10px 28px;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.2s;
         }
-        .reporte-card:last-child { margin-bottom: 0; }
-        .reporte-card:hover {
-            box-shadow: 0 4px 12px rgba(112,19,33,0.12);
-            border-color: var(--color-oro-brillante);
-        }
-
-        .reporte-info { display: flex; align-items: center; gap: 14px; }
-
-        .reporte-num {
-            background: var(--color-primario);
-            color: var(--color-oro-brillante);
-            font-size: 0.75rem;
-            font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 20px;
-            white-space: nowrap;
-        }
-
-        .reporte-texto {}
-        .reporte-titulo {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--texto-oscuro);
-        }
-        .reporte-fecha {
+        .mes-header:hover { background: rgba(0,0,0,0.15); }
+        .mes-header span {
             font-size: 0.78rem;
-            color: #888;
+            font-weight: 600;
+            color: rgba(244,228,193,0.85);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .mes-header .arrow-sm {
+            width: 12px; height: 12px;
+            fill: none; stroke: var(--color-oro); stroke-width: 2.5;
+            transition: transform 0.3s;
+        }
+        .mes-header.open .arrow-sm { transform: rotate(180deg); }
+
+        .mes-content { display: none; }
+        .mes-content.open { display: block; }
+
+        /* Reporte item */
+        .reporte-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 16px 10px 36px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .reporte-item:hover { background: rgba(212,175,55,0.12); }
+        .reporte-item.active {
+            background: var(--color-oro-brillante);
+        }
+        .reporte-item.active .rep-num { background: var(--color-primario); color: var(--color-oro-brillante); }
+        .reporte-item.active .rep-title { color: var(--texto-oscuro); }
+        .reporte-item.active .rep-date { color: rgba(45,10,10,0.65); }
+
+        .rep-num {
+            background: rgba(212,175,55,0.2);
+            color: var(--color-oro-brillante);
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 12px;
+            white-space: nowrap;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .rep-text { flex: 1; }
+        .rep-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            line-height: 1.3;
+        }
+        .rep-date {
+            font-size: 0.7rem;
+            color: rgba(212,175,55,0.6);
             margin-top: 2px;
         }
 
-        .btn-ver {
-            background: var(--color-primario);
-            color: white;
-            text-decoration: none;
-            padding: 8px 18px;
-            border-radius: 10px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            white-space: nowrap;
-            transition: background 0.25s;
-            flex-shrink: 0;
-        }
-        .btn-ver:hover { background: var(--color-oro); color: var(--texto-oscuro); }
-
-        /* ── Vacío ── */
-        .empty {
-            text-align: center;
-            padding: 20px 0;
-            font-size: 0.85rem;
-            color: #bbb;
+        /* Vacío */
+        .sidebar-empty {
+            padding: 10px 20px 14px 36px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.3);
             font-style: italic;
         }
 
-        /* ── Footer ── */
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 0.75rem;
-            color: #aaa;
+        /* ── Content area ── */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: white;
+        }
+
+        .content-placeholder {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            gap: 16px;
+            padding: 40px;
+        }
+        .content-placeholder svg { width: 64px; height: 64px; opacity: 0.3; }
+        .content-placeholder p { font-size: 1rem; font-weight: 600; color: #bbb; }
+        .content-placeholder span { font-size: 0.85rem; color: #ccc; }
+
+        #report-frame {
+            width: 100%;
+            flex: 1;
+            border: none;
+            display: none;
+        }
+
+        /* ── Overlay (mobile) ── */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 5;
         }
 
         /* ── Responsive ── */
-        @media (max-width: 600px) {
-            .header h1 { font-size: 1.4rem; letter-spacing: 1.5px; }
-            .reporte-card { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .btn-ver { align-self: flex-end; }
+        @media (max-width: 768px) {
+            .hamburger { display: block; }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                z-index: 20;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 280px;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .overlay.open { display: block; }
+
+            body { overflow: auto; }
+            .main { overflow: visible; }
         }
     </style>
 </head>
 <body>
-<div class="container">
 
-    <header class="header">
-        <h1>Centro de Reportes</h1>
-        <p>Reportes semanales y mensuales de operaciones — Colegio NWL</p>
-    </header>
-
-    <!-- ══════════════════════════════════════
-         REPORTES SEMANALES
-    ══════════════════════════════════════ -->
-    <div class="tipo-bloque">
-        <button class="tipo-btn open" onclick="toggleTipo(this)">
-            <span>📅 Reportes Semanales</span>
-            <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <!-- Top bar -->
+    <div class="topbar">
+        <button class="hamburger" onclick="toggleSidebar()">
+            <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div class="tipo-body open">
+        <div>
+            <div class="topbar-title">Centro de Reportes</div>
+            <div class="topbar-subtitle">Colegio NWL · Operaciones</div>
+        </div>
+        <div class="topbar-logo">NWL</div>
+    </div>
 
-            <!-- Marzo 2026 -->
-            <div class="mes-bloque">
-                <button class="mes-btn open" onclick="toggleMes(this)">
+    <!-- Overlay (mobile) -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="main">
+
+        <!-- ── Sidebar ── -->
+        <nav class="sidebar" id="sidebar">
+
+            <!-- SEMANALES -->
+            <div class="tipo-header open" onclick="toggleTipo(this)">
+                <span>📅 Semanales</span>
+                <svg class="arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="tipo-content open">
+
+                <!-- Marzo 2026 -->
+                <div class="mes-header open" onclick="toggleMes(this)">
                     <span>Marzo 2026</span>
-                    <svg class="chevron-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
-                <div class="mes-body open">
-
-                    <div class="reporte-card">
-                        <div class="reporte-info">
-                            <span class="reporte-num">Reporte #1</span>
-                            <div class="reporte-texto">
-                                <div class="reporte-titulo">Análisis de Calidad de Datos</div>
-                                <div class="reporte-fecha">15 – 22 de Marzo, 2026 · GHL API (Contactos + Oportunidades)</div>
-                            </div>
+                    <svg class="arrow-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+                <div class="mes-content open">
+                    <a class="reporte-item" onclick="loadReport(this, 'reporte_1_15-22-marzo-2026.html')">
+                        <span class="rep-num">#1</span>
+                        <div class="rep-text">
+                            <div class="rep-title">Calidad de Datos</div>
+                            <div class="rep-date">15 – 22 Mar 2026</div>
                         </div>
-                        <a href="reporte_1_15-22-marzo-2026.html" class="btn-ver">Ver reporte →</a>
-                    </div>
-
+                    </a>
                 </div>
-            </div>
 
-            <!-- Abril 2026 (placeholder) -->
-            <div class="mes-bloque">
-                <button class="mes-btn" onclick="toggleMes(this)">
+                <!-- Abril 2026 -->
+                <div class="mes-header" onclick="toggleMes(this)">
                     <span>Abril 2026</span>
-                    <svg class="chevron-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
-                <div class="mes-body">
-                    <p class="empty">No hay reportes publicados para este mes aún.</p>
+                    <svg class="arrow-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
+                <div class="mes-content">
+                    <p class="sidebar-empty">Sin reportes aún</p>
+                </div>
+
             </div>
 
-        </div>
-    </div>
+            <!-- MENSUALES -->
+            <div class="tipo-header" onclick="toggleTipo(this)">
+                <span>📊 Mensuales</span>
+                <svg class="arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="tipo-content">
 
-    <!-- ══════════════════════════════════════
-         REPORTES MENSUALES
-    ══════════════════════════════════════ -->
-    <div class="tipo-bloque">
-        <button class="tipo-btn" onclick="toggleTipo(this)">
-            <span>📊 Reportes Mensuales</span>
-            <svg class="chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="tipo-body">
-
-            <div class="mes-bloque">
-                <button class="mes-btn open" onclick="toggleMes(this)">
+                <div class="mes-header open" onclick="toggleMes(this)">
                     <span>2026</span>
-                    <svg class="chevron-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
-                <div class="mes-body open">
-                    <p class="empty">No hay reportes mensuales publicados aún.</p>
+                    <svg class="arrow-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
+                <div class="mes-content open">
+                    <p class="sidebar-empty">Sin reportes aún</p>
+                </div>
+
             </div>
 
+        </nav>
+
+        <!-- ── Content ── -->
+        <div class="content">
+
+            <div class="content-placeholder" id="placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
+                    <path d="M9 17v-2m3 2v-4m3 4v-6M5 21h14a2 2 0 002-2V7l-5-5H5a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+                <p>Selecciona un reporte</p>
+                <span>El contenido se desplegará aquí</span>
+            </div>
+
+            <iframe id="report-frame" title="Reporte"></iframe>
+
         </div>
+
     </div>
 
-    <footer>
-        <p>Colegio NWL · Operaciones · Reportes actualizados por el equipo de datos</p>
-    </footer>
+    <script>
+        function toggleTipo(header) {
+            header.classList.toggle('open');
+            header.nextElementSibling.classList.toggle('open');
+        }
 
-</div>
+        function toggleMes(header) {
+            header.classList.toggle('open');
+            header.nextElementSibling.classList.toggle('open');
+        }
 
-<script>
-    function toggleTipo(btn) {
-        btn.classList.toggle('open');
-        btn.nextElementSibling.classList.toggle('open');
-    }
-    function toggleMes(btn) {
-        btn.classList.toggle('open');
-        btn.nextElementSibling.classList.toggle('open');
-    }
-</script>
+        function loadReport(el, url) {
+            // Quitar active de todos
+            document.querySelectorAll('.reporte-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+
+            const frame = document.getElementById('report-frame');
+            const placeholder = document.getElementById('placeholder');
+
+            placeholder.style.display = 'none';
+            frame.style.display = 'block';
+            frame.src = url;
+
+            // Cerrar sidebar en mobile
+            if (window.innerWidth <= 768) toggleSidebar();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('open');
+        }
+    </script>
+
 </body>
 </html>
