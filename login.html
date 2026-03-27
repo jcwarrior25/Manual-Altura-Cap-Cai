@@ -150,42 +150,45 @@
                 nombre: "Coordinador CAP/CAI",
                 password: "cai2026",
                 role: "user",
-                reportes: ["reporte_1_15-22-marzo-2026", "reporte_2_23-29-marzo-2026"]
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
             },
             "elsa.medina": {
                 nombre: "Elsa Medina",
                 password: "elsa2026",
                 role: "user",
-                reportes: ["cap-elsa-medina-w13"]
+                reportes: ["cap-elsa-medina"]
             },
             "daniela.alamilla": {
                 nombre: "Daniela Alamilla",
                 password: "daniela2026",
                 role: "user",
-                reportes: ["cap-daniela-alamilla-w13"]
+                reportes: ["cap-daniela-alamilla"]
             },
             "ana.isabel": {
                 nombre: "Ana Isabel Cervantes",
                 password: "ana2026",
                 role: "user",
-                reportes: ["cap-ana-isabel-w13"]
+                reportes: ["cap-ana-isabel"]
             },
             "delia.rodriguez": {
                 nombre: "Delia Rodriguez",
                 password: "delia2026",
                 role: "user",
-                reportes: ["cap-delia-rodriguez-w13"]
+                reportes: ["cap-delia-rodriguez"]
             },
             "alberto.rodriguez": {
                 nombre: "Alberto Rodriguez",
                 password: "alberto2026",
                 role: "user",
-                reportes: ["cap-alberto-rodriguez-w13"]
+                reportes: ["cap-alberto-rodriguez"]
             }
         };
 
-        if (!localStorage.getItem('nwl_users')) {
+        // Re-seed si cambia la versión del sistema de permisos
+        const NWL_VERSION = "3";
+        if (localStorage.getItem('nwl_version') !== NWL_VERSION) {
             localStorage.setItem('nwl_users', JSON.stringify(USUARIOS_DEFAULT));
+            localStorage.setItem('nwl_version', NWL_VERSION);
         }
 
         // Si ya hay sesión activa, redirigir
