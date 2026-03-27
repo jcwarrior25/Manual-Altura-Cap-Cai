@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Roles — Centro de Reportes NWL</title>
+    <style>
+        :root {
+            --color-primario: #701321;
+            --color-primario-light: #8e1a2a;
+            --color-primario-dark: #4d0d17;
+            --color-oro: #b38e1d;
+            --color-oro-brillante: #d4af37;
+            --color-oro-suave: #F4E4C1;
+            --texto-oscuro: #2d0a0a;
+            --sombra-suave: 0 8px 20px rgba(0,0,0,0.1);
+            --sombra-fuerte: 0 12px 30px rgba(112,19,33,0.2);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Top bar ── */
+        .topbar {
+            background: var(--color-primario-dark);
+            color: var(--color-oro-brillante);
+            padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .topbar-back {
+            background: rgba(212,175,55,0.15);
+            border: 1px solid rgba(212,175,55,0.3);
+            color: var(--color-oro-brillante);
+            padding: 6px 14px; border-radius: 8px;
+            font-size: 0.8rem; font-weight: 600;
+            cursor: pointer; text-decoration: none;
+            transition: background 0.2s;
+        }
+        .topbar-back:hover { background: rgba(212,175,55,0.25); }
+        .topbar-title { font-size: 1rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+        .topbar-subtitle { font-size: 0.75rem; color: rgba(212,175,55,0.7); margin-top: 1px; }
+        .topbar-logo {
+            width: 36px; height: 36px;
+            border: 2px solid var(--color-oro-brillante);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 900;
+            color: var(--color-oro-brillante); letter-spacing: -1px;
+        }
+
+        /* ── Main content ── */
+        .content { flex: 1; padding: 32px 24px; max-width: 960px; margin: 0 auto; width: 100%; }
+
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 1.3rem; font-weight: 800;
+            color: var(--color-primario);
+            letter-spacing: 1px; text-transform: uppercase;
+            border-bottom: 3px solid var(--color-oro); padding-bottom: 8px; display: inline-block;
+        }
+
+        .btn-nuevo {
+            background: var(--color-primario);
+            color: white; border: none;
+            padding: 10px 22px; border-radius: 12px;
+            font-size: 0.9rem; font-weight: 700;
+            cursor: pointer; transition: background 0.3s, transform 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .btn-nuevo:hover { background: var(--color-primario-light); transform: translateY(-2px); }
+
+        /* ── Users table ── */
+        .tabla-wrapper {
+            background: white; border-radius: 16px;
+            box-shadow: var(--sombra-suave); overflow: hidden;
+        }
+
+        .tabla { width: 100%; border-collapse: collapse; }
+        .tabla th {
+            background: var(--color-primario);
+            color: var(--color-oro-brillante);
+            padding: 14px 18px; text-align: left;
+            font-size: 0.82rem; letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .tabla td { padding: 14px 18px; border-bottom: 1px solid #f0e8d0; color: var(--texto-oscuro); font-size: 0.9rem; }
+        .tabla tr:last-child td { border-bottom: none; }
+        .tabla tr:hover td { background: #fdf5e6; }
+
+        .badge-admin {
+            background: var(--color-primario);
+            color: var(--color-oro-brillante);
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px;
+        }
+        .badge-user {
+            background: var(--color-oro-suave);
+            color: var(--texto-oscuro);
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 0.72rem; font-weight: 700;
+        }
+
+        .rep-count {
+            font-size: 0.82rem; color: #888;
+        }
+        .rep-count strong { color: var(--color-primario); font-size: 1rem; }
+
+        .btn-editar {
+            background: var(--color-oro-brillante);
+            color: var(--texto-oscuro); border: none;
+            padding: 6px 16px; border-radius: 8px;
+            font-size: 0.8rem; font-weight: 700;
+            cursor: pointer; transition: background 0.2s;
+            margin-right: 6px;
+        }
+        .btn-editar:hover { background: var(--color-oro); }
+
+        .btn-eliminar {
+            background: #fff0f0; color: #c0392b; border: 1px solid #f5c6cb;
+            padding: 6px 14px; border-radius: 8px;
+            font-size: 0.8rem; font-weight: 700;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn-eliminar:hover { background: #fde8e8; }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            display: none; justify-content: center; align-items: center;
+            z-index: 100; backdrop-filter: blur(4px);
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: white; border-radius: 20px;
+            padding: 36px 32px; width: 100%; max-width: 520px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-top: 5px solid var(--color-primario);
+            max-height: 90vh; overflow-y: auto;
+            transform: scale(0.95); transition: transform 0.25s ease;
+        }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        .modal-title {
+            color: var(--color-primario); font-size: 1.2rem;
+            font-weight: 800; margin-bottom: 24px;
+            letter-spacing: 1px; text-transform: uppercase;
+            border-bottom: 2px solid var(--color-oro); padding-bottom: 10px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block; color: var(--color-primario);
+            font-weight: 600; margin-bottom: 6px; font-size: 0.88rem;
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px 14px;
+            border: 2px solid #e0d0b0; border-radius: 10px;
+            font-size: 0.95rem; font-family: inherit;
+            transition: border-color 0.3s; outline: none;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--color-primario); }
+        .form-group input:disabled { background: #f5f5f5; color: #888; cursor: not-allowed; }
+
+        .form-hint { font-size: 0.78rem; color: #999; margin-top: 4px; }
+
+        /* Reportes checkboxes */
+        .reportes-section { margin-bottom: 18px; }
+        .reportes-section-label {
+            color: var(--color-primario); font-weight: 600; font-size: 0.88rem; margin-bottom: 10px;
+        }
+        .reportes-group { margin-bottom: 12px; }
+        .reportes-group-name {
+            font-size: 0.78rem; font-weight: 700; color: #888;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+        .check-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: 8px; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .check-item:hover { background: #fdf5e6; }
+        .check-item input[type="checkbox"] {
+            width: 16px; height: 16px; cursor: pointer;
+            accent-color: var(--color-primario);
+            border: none; padding: 0;
+        }
+        .check-item span { font-size: 0.88rem; color: var(--texto-oscuro); }
+        .check-item .check-fecha { font-size: 0.75rem; color: #aaa; margin-left: auto; }
+
+        .no-reportes { font-size: 0.85rem; color: #bbb; font-style: italic; padding: 8px 12px; }
+
+        .modal-actions { display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end; }
+        .btn-guardar {
+            background: var(--color-primario); color: white; border: none;
+            padding: 11px 28px; border-radius: 10px;
+            font-size: 0.9rem; font-weight: 700; cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-guardar:hover { background: var(--color-primario-light); }
+        .btn-cancelar {
+            background: #f5f5f5; color: #555; border: 1px solid #ddd;
+            padding: 11px 22px; border-radius: 10px;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-cancelar:hover { background: #eee; }
+
+        .alert-success {
+            background: #f0fdf4; color: #16a34a;
+            border: 1px solid #bbf7d0; border-radius: 10px;
+            padding: 10px 16px; font-size: 0.85rem;
+            margin-bottom: 16px; display: none; text-align: center;
+        }
+        .alert-success.show { display: block; }
+
+        /* Divider */
+        .form-divider {
+            border: none; border-top: 1px solid #f0e8d0; margin: 16px 0;
+        }
+
+        @media (max-width: 600px) {
+            .content { padding: 20px 16px; }
+            .tabla th, .tabla td { padding: 10px 12px; font-size: 0.82rem; }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="reportes.html" class="topbar-back">← Volver</a>
+            <div>
+                <div class="topbar-title">Panel de Roles</div>
+                <div class="topbar-subtitle">Colegio NWL · Administración de Accesos</div>
+            </div>
+        </div>
+        <div class="topbar-logo">NWL</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="section-header">
+            <span class="section-title">Usuarios & Accesos</span>
+            <button class="btn-nuevo" onclick="abrirModalNuevo()">+ Nuevo Usuario</button>
+        </div>
+
+        <div class="tabla-wrapper">
+            <table class="tabla" id="tabla-usuarios">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Reportes</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-usuarios">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal editar/crear usuario -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-titulo">Editar Usuario</div>
+            <div class="alert-success" id="alert-success">Cambios guardados correctamente.</div>
+
+            <div class="form-group">
+                <label>Nombre completo</label>
+                <input type="text" id="f-nombre" placeholder="Ej: Juan Pérez">
+            </div>
+
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" id="f-usuario" placeholder="Ej: jperez">
+                <p class="form-hint" id="f-usuario-hint">El nombre de usuario no se puede cambiar.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña <span style="font-weight:400;color:#aaa">(dejar en blanco para no cambiar)</span></label>
+                <input type="password" id="f-password" placeholder="Nueva contraseña">
+            </div>
+
+            <div class="form-group">
+                <label>Rol</label>
+                <select id="f-rol" onchange="onRolChange()">
+                    <option value="user">👤 Usuario — acceso solo a reportes asignados</option>
+                    <option value="admin">🔑 Administrador — acceso total + panel de roles</option>
+                </select>
+            </div>
+
+            <hr class="form-divider">
+
+            <!-- Reportes section (solo visible si rol = user) -->
+            <div id="reportes-section" class="reportes-section">
+                <div class="reportes-section-label">Reportes visibles para este usuario</div>
+                <div id="reportes-checkboxes"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-guardar" onclick="guardarUsuario()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Catálogo completo de reportes disponibles ──────────────────────────
+        const CATALOGOS = [
+            {
+                tipo: "semanales", label: "Semanales",
+                meses: [
+                    {
+                        nombre: "Marzo 2026",
+                        reportes: [
+                            { id: "reporte_1_15-22-marzo-2026", archivo: "reporte_1_15-22-marzo-2026.html", num: "#1", titulo: "Calidad de Datos", fecha: "15 – 22 Mar 2026" },
+                            { id: "reporte_2_23-29-marzo-2026", archivo: "reporte_2_23-29-marzo-2026.html", num: "#2", titulo: "CRM W13 — Pipeline", fecha: "23 – 29 Mar 2026" }
+                        ]
+                    },
+                    { nombre: "Abril 2026", reportes: [] }
+                ]
+            },
+            {
+                tipo: "mensuales", label: "Mensuales",
+                meses: [
+                    { nombre: "2026", reportes: [] }
+                ]
+            },
+            {
+                tipo: "cap-performance", label: "👤 Reporte Usuarios CAP",
+                meses: [
+                    { nombre: "Marzo 2026 · W13", reportes: [
+                        { id: "cap-elsa-medina-w13",       archivo: "cap_elsa-medina_w13.html",       num: "ZIB", titulo: "Elsa Medina",          fecha: "Zibatá" },
+                        { id: "cap-daniela-alamilla-w13",  archivo: "cap_daniela-alamilla_w13.html",  num: "JUR", titulo: "Daniela Alamilla",     fecha: "Juriquilla" },
+                        { id: "cap-ana-isabel-w13",        archivo: "cap_ana-isabel_w13.html",        num: "JUR", titulo: "Ana Isabel Cervantes", fecha: "Juriquilla" },
+                        { id: "cap-delia-rodriguez-w13",   archivo: "cap_delia-rodriguez_w13.html",   num: "MIL", titulo: "Delia Rodriguez",      fecha: "Milenio" },
+                        { id: "cap-alberto-rodriguez-w13", archivo: "cap_alberto-rodriguez_w13.html", num: "SMA", titulo: "Alberto Rodriguez",    fecha: "SMA" }
+                    ]}
+                ]
+            }
+        ];
+
+        // ── Helpers ───────────────────────────────────────────────────────────
+        function getUsers() { return JSON.parse(localStorage.getItem('nwl_users') || '{}'); }
+        function saveUsers(u) { localStorage.setItem('nwl_users', JSON.stringify(u)); }
+        function getSession() { return JSON.parse(localStorage.getItem('nwl_session') || 'null'); }
+
+        function getAllReportes() {
+            const all = [];
+            CATALOGOS.forEach(c => c.meses.forEach(m => m.reportes.forEach(r => all.push({ ...r, mes: m.nombre, tipo: c.label }))));
+            return all;
+        }
+
+        // ── Auth check ────────────────────────────────────────────────────────
+        const session = getSession();
+        if (!session) { window.location.href = 'login.html'; }
+        const users = getUsers();
+        if (!users[session.usuario] || users[session.usuario].role !== 'admin') {
+            window.location.href = 'reportes.html';
+        }
+
+        // ── Render tabla ──────────────────────────────────────────────────────
+        function renderTabla() {
+            const users = getUsers();
+            const tbody = document.getElementById('tbody-usuarios');
+            const allReportes = getAllReportes();
+            tbody.innerHTML = '';
+
+            Object.entries(users).forEach(([username, user]) => {
+                const isAdmin = user.role === 'admin';
+                const repCount = isAdmin
+                    ? `<strong>${allReportes.length > 0 ? 'Todos' : '—'}</strong>`
+                    : `<strong>${(user.reportes || []).length}</strong> / ${allReportes.length}`;
+                const esYo = username === session.usuario;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${user.nombre}</strong></td>
+                    <td style="color:#888;font-size:0.85rem;font-family:monospace">${username}</td>
+                    <td>${isAdmin
+                        ? '<span class="badge-admin">🔑 Admin</span>'
+                        : '<span class="badge-user">👤 Usuario</span>'}</td>
+                    <td><span class="rep-count">${repCount}</span></td>
+                    <td>
+                        <button class="btn-editar" onclick="abrirModalEditar('${username}')">Editar</button>
+                        ${!esYo ? `<button class="btn-eliminar" onclick="eliminarUsuario('${username}')">Eliminar</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ── Render checkboxes de reportes ─────────────────────────────────────
+        function renderCheckboxes(reportesAsignados) {
+            const container = document.getElementById('reportes-checkboxes');
+            container.innerHTML = '';
+            let hayReportes = false;
+
+            CATALOGOS.forEach(cat => {
+                cat.meses.forEach(mes => {
+                    if (mes.reportes.length === 0) return;
+                    hayReportes = true;
+                    const group = document.createElement('div');
+                    group.className = 'reportes-group';
+                    group.innerHTML = `<div class="reportes-group-name">${cat.label} · ${mes.nombre}</div>`;
+                    mes.reportes.forEach(r => {
+                        const checked = reportesAsignados.includes(r.id) ? 'checked' : '';
+                        const item = document.createElement('label');
+                        item.className = 'check-item';
+                        item.innerHTML = `
+                            <input type="checkbox" value="${r.id}" ${checked}>
+                            <span>${r.num} ${r.titulo}</span>
+                            <span class="check-fecha">${r.fecha}</span>
+                        `;
+                        group.appendChild(item);
+                    });
+                    container.appendChild(group);
+                });
+            });
+
+            if (!hayReportes) {
+                container.innerHTML = '<p class="no-reportes">No hay reportes disponibles en el catálogo aún.</p>';
+            }
+        }
+
+        // ── Modal ─────────────────────────────────────────────────────────────
+        let modoEdicion = null; // username o null si es nuevo
+
+        function abrirModalNuevo() {
+            modoEdicion = null;
+            document.getElementById('modal-titulo').textContent = 'Nuevo Usuario';
+            document.getElementById('f-nombre').value = '';
+            document.getElementById('f-usuario').value = '';
+            document.getElementById('f-usuario').disabled = false;
+            document.getElementById('f-usuario-hint').textContent = 'Nombre de usuario para iniciar sesión.';
+            document.getElementById('f-password').value = '';
+            document.getElementById('f-rol').value = 'user';
+            document.getElementById('alert-success').classList.remove('show');
+            renderCheckboxes([]);
+            document.getElementById('reportes-section').style.display = 'block';
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function abrirModalEditar(username) {
+            modoEdicion = username;
+            const users = getUsers();
+            const user = users[username];
+            document.getElementById('modal-titulo').textContent = 'Editar Usuario';
+            document.getElementById('f-nombre').value = user.nombre;
+            document.getElementById('f-usuario').value = username;
+            document.getElementById('f-usuario').disabled = true;
+            document.getElementById('f-usuario-hint').textContent = 'El nombre de usuario no se puede cambiar.';
+            document.getElementById('f-password').value = '';
+            document.getElementById('f-rol').value = user.role;
+            document.getElementById('alert-success').classList.remove('show');
+            const esAdmin = user.role === 'admin';
+            document.getElementById('reportes-section').style.display = esAdmin ? 'none' : 'block';
+            renderCheckboxes(user.reportes || []);
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function onRolChange() {
+            const rol = document.getElementById('f-rol').value;
+            document.getElementById('reportes-section').style.display = rol === 'admin' ? 'none' : 'block';
+        }
+
+        function guardarUsuario() {
+            const users = getUsers();
+            const nombre = document.getElementById('f-nombre').value.trim();
+            const username = modoEdicion || document.getElementById('f-usuario').value.trim().toLowerCase();
+            const password = document.getElementById('f-password').value;
+            const role = document.getElementById('f-rol').value;
+
+            if (!nombre || !username) { alert('Nombre y usuario son obligatorios.'); return; }
+            if (!modoEdicion && users[username]) { alert('Ese nombre de usuario ya existe.'); return; }
+            if (!modoEdicion && !password) { alert('La contraseña es obligatoria para un usuario nuevo.'); return; }
+
+            // Recoger reportes seleccionados
+            const checkboxes = document.querySelectorAll('#reportes-checkboxes input[type="checkbox"]:checked');
+            const reportes = Array.from(checkboxes).map(c => c.value);
+
+            const userData = {
+                nombre,
+                password: password || (users[username] && users[username].password) || '',
+                role,
+                reportes: role === 'admin' ? [] : reportes
+            };
+
+            users[username] = userData;
+            saveUsers(users);
+
+            // Actualizar sesión si es el usuario actual
+            if (username === session.usuario) {
+                localStorage.setItem('nwl_session', JSON.stringify({ usuario: username, ...userData }));
+            }
+
+            document.getElementById('alert-success').classList.add('show');
+            setTimeout(() => {
+                cerrarModal();
+                renderTabla();
+            }, 900);
+        }
+
+        function eliminarUsuario(username) {
+            if (!confirm(`¿Eliminar al usuario "${username}"? Esta acción no se puede deshacer.`)) return;
+            const users = getUsers();
+            delete users[username];
+            saveUsers(users);
+            renderTabla();
+        }
+
+        // ── Cerrar modal al click fuera ───────────────────────────────────────
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
+
+        // ── Init ──────────────────────────────────────────────────────────────
+        renderTabla();
+    </script>
+
+</body>
+</html>

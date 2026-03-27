@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delia Rodriguez — CAP Performance W13</title>
+    <style>
+        :root { --color-primario: #701321; --color-primario-light: #8e1a2a; --color-oro: #b38e1d; --color-oro-brillante: #d4af37; --color-oro-suave: #F4E4C1; --texto-oscuro: #2d0a0a; --sombra: 0 4px 16px rgba(0,0,0,.07); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: radial-gradient(circle at center, #fff 0%, #f0f0f0 100%); color: var(--texto-oscuro); min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--color-primario); text-decoration: none; font-size: .85rem; font-weight: 600; }
+        .back-link:hover { text-decoration: underline; }
+        .header { text-align: center; margin-bottom: 28px; }
+        .campus-badge { display: inline-block; background: var(--color-oro-suave); color: var(--color-oro); padding: 4px 16px; border-radius: 20px; font-size: .78rem; font-weight: 700; margin-bottom: 12px; }
+        .header h1 { font-size: 2rem; letter-spacing: 3px; color: var(--color-primario); text-transform: uppercase; border-bottom: 3px solid var(--color-oro); padding-bottom: 10px; display: inline-block; }
+        .header-sub { font-size: .82rem; color: #888; margin-top: 8px; }
+        .rating-card { display: flex; align-items: center; justify-content: center; gap: 24px; background: var(--color-primario); border-radius: 16px; padding: 22px 32px; margin-bottom: 28px; box-shadow: 0 8px 24px rgba(112,19,33,.22); }
+        .rating-num { font-size: 3rem; font-weight: 900; color: var(--color-oro-brillante); line-height: 1; }
+        .rating-label { font-size: 1rem; font-weight: 700; color: rgba(255,255,255,.9); }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 24px; }
+        .kpi { background: white; border-radius: 12px; padding: 16px 10px; text-align: center; box-shadow: var(--sombra); border-top: 3px solid var(--color-oro); }
+        .kpi.alerta { border-top-color: var(--color-primario); }
+        .kpi .num { font-size: 1.7rem; font-weight: 800; color: var(--color-primario); }
+        .kpi .lbl { font-size: .68rem; color: #777; margin-top: 4px; line-height: 1.3; }
+        .card { background: white; border-radius: 14px; box-shadow: var(--sombra); margin-bottom: 20px; overflow: hidden; }
+        .card-head { padding: 15px 22px; border-bottom: 1px solid #f0e8d0; }
+        .card-head h2 { font-size: .93rem; font-weight: 700; color: var(--color-primario); }
+        .card-body { padding: 18px 22px; }
+        .conv { background: #faf8f4; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+        .conv:last-child { margin-bottom: 0; }
+        .conv-name { font-weight: 700; font-size: .87rem; color: var(--color-primario); }
+        .conv-meta { font-size: .73rem; color: #999; margin: 4px 0 8px; }
+        .conv-ctx { font-size: .8rem; color: #555; margin-bottom: 8px; line-height: 1.5; }
+        blockquote { border-left: 3px solid var(--color-oro); padding: 8px 12px; font-style: italic; font-size: .8rem; color: #555; background: rgba(179,142,29,.05); border-radius: 0 8px 8px 0; }
+        .items { padding-left: 18px; font-size: .83rem; line-height: 1.9; color: #444; }
+        .focus-box { background: var(--color-oro-suave); border-left: 4px solid var(--color-oro-brillante); border-radius: 0 12px 12px 0; padding: 14px 18px; font-size: .88rem; color: var(--texto-oscuro); line-height: 1.65; }
+        .footer { text-align: center; padding: 28px 0 8px; font-size: .73rem; color: #ccc; }
+        @media (max-width: 600px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .rating-num { font-size: 2.2rem; } .header h1 { font-size: 1.5rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="reportes.html" class="back-link">← Todos los reportes</a>
+
+    <div class="header">
+        <div><span class="campus-badge">📍 Milenio</span></div>
+        <h1>Delia Rodriguez</h1>
+        <div class="header-sub">CAP Performance · Semana W13 · Mar 23–29, 2026</div>
+    </div>
+
+    <div class="rating-card">
+        <div class="rating-num">7/10</div>
+        <div class="rating-label">Buena Vendedora Atrapada en Campus Difícil</div>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi"><div class="num">55</div><div class="lbl">Opps activas</div></div>
+        <div class="kpi"><div class="num">5</div><div class="lbl">Leads nuevos</div></div>
+        <div class="kpi alerta"><div class="num">0</div><div class="lbl">Inscripciones</div></div>
+        <div class="kpi"><div class="num">0</div><div class="lbl">Perdidos (tw)</div></div>
+        <div class="kpi alerta"><div class="num">25</div><div class="lbl">Calificado sin agendar</div></div>
+        <div class="kpi"><div class="num">7</div><div class="lbl">Post-visita</div></div>
+        <div class="kpi alerta"><div class="num">15</div><div class="lbl">No-shows acum.</div></div>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h2>💬 Conversaciones Revisadas</h2></div>
+        <div class="card-body">
+            <div class="conv">
+                <div class="conv-name">Francisco Morales</div>
+                <div class="conv-meta">Etapa: Cita Realizada · 30 mensajes (17 salientes / 11 entrantes)</div>
+                <div class="conv-ctx">Familia buscando escuela para Mateo. Visitó Milenio 12 marzo. Excelente follow-up post-visita.</div>
+                <blockquote>"Hola Francisco, espero se encuentre muy bien, qué le pareció a Mateo el colegio? 😀 cómo les fue visitando casas este fin de semana?"</blockquote>
+            </div>
+            <div class="conv">
+                <div class="conv-name">Elva Fernanda Guzmán Padrón</div>
+                <div class="conv-meta">Etapa: Calificado · 29 mensajes (19 salientes / 8 entrantes)</div>
+                <div class="conv-ctx">Interesada en Primaria y Secundaria. Pidió info por correo. Delia ofreció videollamada.</div>
+                <blockquote>"me encantaría que podamos hacer una vídeo llamada para poderte platicar del modelo educativo y desglosarte el plan de inversión, ¿te gustaría?"</blockquote>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h2>✅ Lo que se está haciendo bien</h2></div>
+        <div class="card-body">
+            <ul class="items">
+                <li>Follow-up con Francisco es EL MEJOR de las conversaciones revisadas: preguntó por Mateo por nombre y por la mudanza. Venta consultiva real, no template.</li>
+                <li>Flexibilidad con Elva (Morelia): envió costos exactos, calculó B.E. personalizado ($8,101 primaria), ofreció videollamada. Adaptó canal a la situación.</li>
+                <li>0 perdidos esta semana — retiene pipeline activamente.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h2>🔴 Oportunidades de Mejora</h2></div>
+        <div class="card-body">
+            <ul class="items">
+                <li>🔴 15 no-shows — el más alto del equipo. El sistema ya envía recordatorios automáticos (24h, 2h), pero no es suficiente para Milenio. Necesita llamada telefónica el día anterior.</li>
+                <li>Francisco lleva 15 días post-visita sin empuje a perfil. Las buenas conversaciones mueren sin CTA concreto.</li>
+                <li>Enviar costos por WhatsApp ANTES de visita genera rechazo — el precio sin contexto de valor espanta.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h2>🎯 Foco Próxima Semana</h2></div>
+        <div class="card-body">
+            <div class="focus-box">
+                Llamar a Francisco HOY (15 días post-visita). Confirmar citas por LLAMADA 2h antes. Dejar de enviar costos antes de visita — ofrecer videollamada primero.
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">Reporte generado por ALTURA Performance Marketing · Pipeline NWL W13</div>
+</div>
+</body>
+</html>

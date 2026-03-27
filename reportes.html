@@ -21,10 +21,8 @@
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: #f0f0f0;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
         }
 
         /* ── Top bar ── */
@@ -32,121 +30,111 @@
             background: var(--color-primario-dark);
             color: var(--color-oro-brillante);
             padding: 14px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between;
             flex-shrink: 0;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             z-index: 10;
         }
+        .topbar-center { flex: 1; text-align: center; }
         .topbar-title {
-            font-size: 1rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            font-size: 1rem; font-weight: 800;
+            letter-spacing: 2px; text-transform: uppercase;
         }
-        .topbar-subtitle {
-            font-size: 0.75rem;
-            color: rgba(212,175,55,0.7);
-            margin-top: 1px;
+        .topbar-subtitle { font-size: 0.75rem; color: rgba(212,175,55,0.7); margin-top: 1px; }
+
+        .topbar-right {
+            display: flex; align-items: center; gap: 10px;
         }
-        .topbar-logo {
-            width: 36px;
-            height: 36px;
-            border: 2px solid var(--color-oro-brillante);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            font-weight: 900;
+        .topbar-user-info {
+            display: flex; flex-direction: column; align-items: flex-end;
+        }
+        .topbar-user-name {
+            font-size: 0.78rem; font-weight: 700; color: var(--color-oro-suave);
+            max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .topbar-user-role {
+            font-size: 0.68rem; color: rgba(212,175,55,0.65);
+        }
+
+        .topbar-admin-btn {
+            background: rgba(212,175,55,0.15);
+            border: 1px solid rgba(212,175,55,0.35);
             color: var(--color-oro-brillante);
-            letter-spacing: -1px;
+            padding: 5px 12px; border-radius: 8px;
+            font-size: 0.75rem; font-weight: 700;
+            cursor: pointer; text-decoration: none;
+            transition: background 0.2s; white-space: nowrap;
+            display: none;
         }
+        .topbar-admin-btn:hover { background: rgba(212,175,55,0.28); }
+
+        .topbar-logout {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.7);
+            padding: 5px 12px; border-radius: 8px;
+            font-size: 0.75rem; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .topbar-logout:hover { background: rgba(255,255,255,0.15); color: white; }
 
         /* ── Hamburger (mobile) ── */
         .hamburger {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
+            display: none; background: none; border: none;
+            cursor: pointer; padding: 4px;
         }
         .hamburger svg { width: 24px; height: 24px; stroke: var(--color-oro-brillante); stroke-width: 2; fill: none; }
 
         /* ── Main layout ── */
-        .main {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
+        .main { display: flex; flex: 1; overflow: hidden; }
 
         /* ── Sidebar ── */
         .sidebar {
             width: var(--sidebar-w);
             background: var(--color-primario);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            overflow-y: auto;
-            overflow-x: hidden;
+            display: flex; flex-direction: column;
+            flex-shrink: 0; overflow-y: auto; overflow-x: hidden;
         }
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: var(--color-primario-dark); }
         .sidebar::-webkit-scrollbar-thumb { background: var(--color-oro); border-radius: 4px; }
 
-        /* Tipo section (Semanal / Mensual) */
         .tipo-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 20px;
-            cursor: pointer;
-            user-select: none;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 20px; cursor: pointer; user-select: none;
             border-bottom: 1px solid rgba(255,255,255,0.07);
             transition: background 0.2s;
         }
         .tipo-header:hover { background: var(--color-primario-light); }
         .tipo-header span {
-            font-size: 0.82rem;
-            font-weight: 700;
+            font-size: 0.82rem; font-weight: 700;
             color: var(--color-oro-brillante);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            letter-spacing: 0.5px; text-transform: uppercase;
         }
         .tipo-header .arrow {
-            width: 14px; height: 14px;
-            fill: none; stroke: var(--color-oro-brillante); stroke-width: 2.5;
-            transition: transform 0.3s;
-            flex-shrink: 0;
+            width: 14px; height: 14px; fill: none;
+            stroke: var(--color-oro-brillante); stroke-width: 2.5;
+            transition: transform 0.3s; flex-shrink: 0;
         }
         .tipo-header.open .arrow { transform: rotate(180deg); }
 
         .tipo-content { display: none; }
         .tipo-content.open { display: block; }
 
-        /* Mes header */
         .mes-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px 10px 28px;
-            cursor: pointer;
-            user-select: none;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: background 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px 10px 28px; cursor: pointer; user-select: none;
+            border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.2s;
         }
         .mes-header:hover { background: rgba(0,0,0,0.15); }
         .mes-header span {
-            font-size: 0.78rem;
-            font-weight: 600;
+            font-size: 0.78rem; font-weight: 600;
             color: rgba(244,228,193,0.85);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            text-transform: uppercase; letter-spacing: 0.5px;
         }
         .mes-header .arrow-sm {
-            width: 12px; height: 12px;
-            fill: none; stroke: var(--color-oro); stroke-width: 2.5;
+            width: 12px; height: 12px; fill: none;
+            stroke: var(--color-oro); stroke-width: 2.5;
             transition: transform 0.3s;
         }
         .mes-header.open .arrow-sm { transform: rotate(180deg); }
@@ -154,115 +142,66 @@
         .mes-content { display: none; }
         .mes-content.open { display: block; }
 
-        /* Reporte item */
         .reporte-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 10px 16px 10px 36px;
-            cursor: pointer;
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 10px 16px 10px 36px; cursor: pointer;
             border-bottom: 1px solid rgba(255,255,255,0.04);
-            transition: background 0.2s;
-            text-decoration: none;
+            transition: background 0.2s; text-decoration: none;
         }
         .reporte-item:hover { background: rgba(212,175,55,0.12); }
-        .reporte-item.active {
-            background: var(--color-oro-brillante);
-        }
+        .reporte-item.active { background: var(--color-oro-brillante); }
         .reporte-item.active .rep-num { background: var(--color-primario); color: var(--color-oro-brillante); }
         .reporte-item.active .rep-title { color: var(--texto-oscuro); }
         .reporte-item.active .rep-date { color: rgba(45,10,10,0.65); }
 
         .rep-num {
-            background: rgba(212,175,55,0.2);
-            color: var(--color-oro-brillante);
-            font-size: 0.65rem;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 12px;
-            white-space: nowrap;
-            margin-top: 2px;
-            flex-shrink: 0;
+            background: rgba(212,175,55,0.2); color: var(--color-oro-brillante);
+            font-size: 0.65rem; font-weight: 800;
+            padding: 2px 8px; border-radius: 12px;
+            white-space: nowrap; margin-top: 2px; flex-shrink: 0;
         }
         .rep-text { flex: 1; }
-        .rep-title {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.9);
-            line-height: 1.3;
-        }
-        .rep-date {
-            font-size: 0.7rem;
-            color: rgba(212,175,55,0.6);
-            margin-top: 2px;
-        }
+        .rep-title { font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.9); line-height: 1.3; }
+        .rep-date { font-size: 0.7rem; color: rgba(212,175,55,0.6); margin-top: 2px; }
 
-        /* Vacío */
         .sidebar-empty {
             padding: 10px 20px 14px 36px;
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.3);
-            font-style: italic;
+            font-size: 0.75rem; color: rgba(255,255,255,0.3); font-style: italic;
         }
 
         /* ── Content area ── */
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background: white;
-        }
+        .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: white; }
 
         .content-placeholder {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #ccc;
-            gap: 16px;
-            padding: 40px;
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: #ccc; gap: 16px; padding: 40px;
         }
         .content-placeholder svg { width: 64px; height: 64px; opacity: 0.3; }
         .content-placeholder p { font-size: 1rem; font-weight: 600; color: #bbb; }
         .content-placeholder span { font-size: 0.85rem; color: #ccc; }
 
-        #report-frame {
-            width: 100%;
-            flex: 1;
-            border: none;
-            display: none;
-        }
+        #report-frame { width: 100%; flex: 1; border: none; display: none; }
 
         /* ── Overlay (mobile) ── */
         .overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 5;
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 5;
         }
 
         /* ── Responsive ── */
         @media (max-width: 768px) {
             .hamburger { display: block; }
-
             .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                height: 100%;
-                z-index: 20;
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                width: 280px;
+                position: fixed; top: 0; left: 0; height: 100%;
+                z-index: 20; transform: translateX(-100%);
+                transition: transform 0.3s ease; width: 280px;
             }
             .sidebar.open { transform: translateX(0); }
             .overlay.open { display: block; }
-
             body { overflow: auto; }
             .main { overflow: visible; }
+            .topbar-user-info { display: none; }
         }
     </style>
 </head>
@@ -273,83 +212,29 @@
         <button class="hamburger" onclick="toggleSidebar()">
             <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div>
+        <div class="topbar-center">
             <div class="topbar-title">Centro de Reportes</div>
             <div class="topbar-subtitle">Colegio NWL · Operaciones</div>
         </div>
-        <div class="topbar-logo">NWL</div>
+        <div class="topbar-right">
+            <a href="admin-roles.html" class="topbar-admin-btn" id="admin-btn">⚙ Roles</a>
+            <div class="topbar-user-info">
+                <span class="topbar-user-name" id="topbar-user-name"></span>
+                <span class="topbar-user-role" id="topbar-user-role"></span>
+            </div>
+            <button class="topbar-logout" onclick="logout()">Salir</button>
+        </div>
     </div>
 
     <!-- Overlay (mobile) -->
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
     <div class="main">
+        <!-- Sidebar (generado por JS) -->
+        <nav class="sidebar" id="sidebar"></nav>
 
-        <!-- ── Sidebar ── -->
-        <nav class="sidebar" id="sidebar">
-
-            <!-- SEMANALES -->
-            <div class="tipo-header open" onclick="toggleTipo(this)">
-                <span>📅 Semanales</span>
-                <svg class="arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div class="tipo-content open">
-
-                <!-- Marzo 2026 -->
-                <div class="mes-header open" onclick="toggleMes(this)">
-                    <span>Marzo 2026</span>
-                    <svg class="arrow-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="mes-content open">
-                                        <a class="reporte-item" onclick="loadReport(this, 'reporte-semanal-2026-W13.html')">
-                        <span class="rep-num">W13</span>
-                        <div class="rep-text">
-                            <div class="rep-title">Reporte Semanal CRM</div>
-                            <div class="rep-date">Mar 23–29, 2026</div>
-                        </div>
-                    </a>
-<a class="reporte-item" onclick="loadReport(this, 'reporte_1_15-22-marzo-2026.html')">
-                        <span class="rep-num">#1</span>
-                        <div class="rep-text">
-                            <div class="rep-title">Calidad de Datos</div>
-                            <div class="rep-date">15 – 22 Mar 2026</div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Abril 2026 -->
-                <div class="mes-header" onclick="toggleMes(this)">
-                    <span>Abril 2026</span>
-                    <svg class="arrow-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="mes-content">
-                    <p class="sidebar-empty">Sin reportes aún</p>
-                </div>
-
-            </div>
-
-            <!-- MENSUALES -->
-            <div class="tipo-header" onclick="toggleTipo(this)">
-                <span>📊 Mensuales</span>
-                <svg class="arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div class="tipo-content">
-
-                <div class="mes-header open" onclick="toggleMes(this)">
-                    <span>2026</span>
-                    <svg class="arrow-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                </div>
-                <div class="mes-content open">
-                    <p class="sidebar-empty">Sin reportes aún</p>
-                </div>
-
-            </div>
-
-        </nav>
-
-        <!-- ── Content ── -->
+        <!-- Content -->
         <div class="content">
-
             <div class="content-placeholder" id="placeholder">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
                     <path d="M9 17v-2m3 2v-4m3 4v-6M5 21h14a2 2 0 002-2V7l-5-5H5a2 2 0 00-2 2v14a2 2 0 002 2z"/>
@@ -357,14 +242,123 @@
                 <p>Selecciona un reporte</p>
                 <span>El contenido se desplegará aquí</span>
             </div>
-
             <iframe id="report-frame" title="Reporte"></iframe>
-
         </div>
-
     </div>
 
     <script>
+        // ── Catálogo completo de reportes ─────────────────────────────────────
+        const CATALOGOS = [
+            {
+                tipo: "semanales", label: "📅 Semanales",
+                meses: [
+                    {
+                        nombre: "Marzo 2026",
+                        reportes: [
+                            { id: "reporte_1_15-22-marzo-2026", archivo: "reporte_1_15-22-marzo-2026.html", num: "#1", titulo: "Calidad de Datos", fecha: "15 – 22 Mar 2026" },
+                            { id: "reporte_2_23-29-marzo-2026", archivo: "reporte_2_23-29-marzo-2026.html", num: "#2", titulo: "CRM W13 — Pipeline", fecha: "23 – 29 Mar 2026" }
+                        ]
+                    },
+                    { nombre: "Abril 2026", reportes: [] }
+                ]
+            },
+            {
+                tipo: "mensuales", label: "📊 Mensuales",
+                meses: [
+                    { nombre: "2026", reportes: [] }
+                ]
+            },
+            {
+                tipo: "cap-performance", label: "👤 Reporte Usuarios CAP",
+                meses: [
+                    { nombre: "Marzo 2026 · W13", reportes: [
+                        { id: "cap-elsa-medina-w13",       archivo: "cap_elsa-medina_w13.html",       num: "ZIB", titulo: "Elsa Medina",          fecha: "Zibatá" },
+                        { id: "cap-daniela-alamilla-w13",  archivo: "cap_daniela-alamilla_w13.html",  num: "JUR", titulo: "Daniela Alamilla",     fecha: "Juriquilla" },
+                        { id: "cap-ana-isabel-w13",        archivo: "cap_ana-isabel_w13.html",        num: "JUR", titulo: "Ana Isabel Cervantes", fecha: "Juriquilla" },
+                        { id: "cap-delia-rodriguez-w13",   archivo: "cap_delia-rodriguez_w13.html",   num: "MIL", titulo: "Delia Rodriguez",      fecha: "Milenio" },
+                        { id: "cap-alberto-rodriguez-w13", archivo: "cap_alberto-rodriguez_w13.html", num: "SMA", titulo: "Alberto Rodriguez",    fecha: "SMA" }
+                    ]}
+                ]
+            }
+        ];
+
+        // ── Auth ──────────────────────────────────────────────────────────────
+        function getSession() { return JSON.parse(localStorage.getItem('nwl_session') || 'null'); }
+        function getUsers()   { return JSON.parse(localStorage.getItem('nwl_users')   || '{}'); }
+        function getCurrentUser() {
+            const session = getSession();
+            if (!session) return null;
+            const users = getUsers();
+            return users[session.usuario] ? { usuario: session.usuario, ...users[session.usuario] } : null;
+        }
+
+        // Verificar sesión al cargar
+        const currentUser = getCurrentUser();
+        if (!currentUser) { window.location.href = 'login.html'; }
+
+        function logout() {
+            localStorage.removeItem('nwl_session');
+            window.location.href = 'login.html';
+        }
+
+        // ── Sidebar dinámico ──────────────────────────────────────────────────
+        function generarSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const esAdmin = currentUser.role === 'admin';
+            const reportesPermitidos = esAdmin ? null : (currentUser.reportes || []);
+            let html = '';
+            let primerTipo = true;
+
+            CATALOGOS.forEach(cat => {
+                const openTipo = primerTipo ? 'open' : '';
+                primerTipo = false;
+                html += `
+                    <div class="tipo-header ${openTipo}" onclick="toggleTipo(this)">
+                        <span>${cat.label}</span>
+                        <svg class="arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="tipo-content ${openTipo}">
+                `;
+
+                let primerMes = true;
+                cat.meses.forEach(mes => {
+                    const openMes = primerMes ? 'open' : '';
+                    primerMes = false;
+                    const filtrados = mes.reportes.filter(r =>
+                        reportesPermitidos === null || reportesPermitidos.includes(r.id)
+                    );
+                    html += `
+                        <div class="mes-header ${openMes}" onclick="toggleMes(this)">
+                            <span>${mes.nombre}</span>
+                            <svg class="arrow-sm" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
+                        <div class="mes-content ${openMes}">
+                    `;
+                    if (filtrados.length === 0) {
+                        html += `<p class="sidebar-empty">Sin reportes disponibles</p>`;
+                    } else {
+                        filtrados.forEach(r => {
+                            html += `
+                                <a class="reporte-item" onclick="loadReport(this, '${r.archivo}')">
+                                    <span class="rep-num">${r.num}</span>
+                                    <div class="rep-text">
+                                        <div class="rep-title">${r.titulo}</div>
+                                        <div class="rep-date">${r.fecha}</div>
+                                    </div>
+                                </a>
+                            `;
+                        });
+                    }
+                    html += `</div>`;
+                });
+
+                html += `</div>`;
+            });
+
+            sidebar.innerHTML = html;
+        }
+
+        // ── Toggle helpers ────────────────────────────────────────────────────
         function toggleTipo(header) {
             header.classList.toggle('open');
             header.nextElementSibling.classList.toggle('open');
@@ -376,18 +370,12 @@
         }
 
         function loadReport(el, url) {
-            // Quitar active de todos
             document.querySelectorAll('.reporte-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
-
             const frame = document.getElementById('report-frame');
-            const placeholder = document.getElementById('placeholder');
-
-            placeholder.style.display = 'none';
+            document.getElementById('placeholder').style.display = 'none';
             frame.style.display = 'block';
             frame.src = url;
-
-            // Cerrar sidebar en mobile
             if (window.innerWidth <= 768) toggleSidebar();
         }
 
@@ -395,6 +383,16 @@
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('overlay').classList.toggle('open');
         }
+
+        // ── Init ──────────────────────────────────────────────────────────────
+        document.getElementById('topbar-user-name').textContent = currentUser.nombre || currentUser.usuario;
+        document.getElementById('topbar-user-role').textContent = currentUser.role === 'admin' ? '🔑 Administrador' : '👤 Usuario';
+
+        if (currentUser.role === 'admin') {
+            document.getElementById('admin-btn').style.display = 'inline-flex';
+        }
+
+        generarSidebar();
     </script>
 
 </body>
