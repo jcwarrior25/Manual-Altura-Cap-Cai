@@ -330,37 +330,37 @@
                 tipo: "semanales", label: "Semanales",
                 meses: [
                     {
-                        nombre: "Marzo 2026",
+                        nombre: "Marzo 2026", permisoId: "semanales-marzo-2026",
                         reportes: [
                             { id: "reporte_1_15-22-marzo-2026", archivo: "reporte_1_15-22-marzo-2026.html", num: "#1", titulo: "Calidad de Datos", fecha: "15 – 22 Mar 2026" },
                             { id: "reporte_2_23-29-marzo-2026", archivo: "reporte_2_23-29-marzo-2026.html", num: "#2", titulo: "CRM W13 — Pipeline", fecha: "23 – 29 Mar 2026" }
                         ]
                     },
-                    { nombre: "Abril 2026", reportes: [] }
+                    { nombre: "Abril 2026", permisoId: "semanales-abril-2026", reportes: [] }
                 ]
             },
             {
                 tipo: "mensuales", label: "Mensuales",
                 meses: [
-                    { nombre: "2026", reportes: [] }
+                    { nombre: "2026", permisoId: "mensuales-2026", reportes: [] }
                 ]
             },
             {
                 tipo: "cap-performance", label: "👤 Reporte Usuarios CAP",
                 meses: [
-                    { nombre: "Elsa Medina · Zibatá", reportes: [
+                    { nombre: "Elsa Medina · Zibatá", permisoId: "cap-elsa-medina", reportes: [
                         { id: "cap-elsa-medina-w13", archivo: "cap_elsa-medina_w13.html", num: "W13", titulo: "Semana W13", fecha: "Mar 23–29, 2026" }
                     ]},
-                    { nombre: "Daniela Alamilla · Juriquilla", reportes: [
+                    { nombre: "Daniela Alamilla · Juriquilla", permisoId: "cap-daniela-alamilla", reportes: [
                         { id: "cap-daniela-alamilla-w13", archivo: "cap_daniela-alamilla_w13.html", num: "W13", titulo: "Semana W13", fecha: "Mar 23–29, 2026" }
                     ]},
-                    { nombre: "Ana Isabel Cervantes · Juriquilla", reportes: [
+                    { nombre: "Ana Isabel Cervantes · Juriquilla", permisoId: "cap-ana-isabel", reportes: [
                         { id: "cap-ana-isabel-w13", archivo: "cap_ana-isabel_w13.html", num: "W13", titulo: "Semana W13", fecha: "Mar 23–29, 2026" }
                     ]},
-                    { nombre: "Delia Rodriguez · Milenio", reportes: [
+                    { nombre: "Delia Rodriguez · Milenio", permisoId: "cap-delia-rodriguez", reportes: [
                         { id: "cap-delia-rodriguez-w13", archivo: "cap_delia-rodriguez_w13.html", num: "W13", titulo: "Semana W13", fecha: "Mar 23–29, 2026" }
                     ]},
-                    { nombre: "Alberto Rodriguez · SMA", reportes: [
+                    { nombre: "Alberto Rodriguez · SMA", permisoId: "cap-alberto-rodriguez", reportes: [
                         { id: "cap-alberto-rodriguez-w13", archivo: "cap_alberto-rodriguez_w13.html", num: "W13", titulo: "Semana W13", fecha: "Mar 23–29, 2026" }
                     ]}
                 ]
@@ -372,10 +372,12 @@
         function saveUsers(u) { localStorage.setItem('nwl_users', JSON.stringify(u)); }
         function getSession() { return JSON.parse(localStorage.getItem('nwl_session') || 'null'); }
 
-        function getAllReportes() {
-            const all = [];
-            CATALOGOS.forEach(c => c.meses.forEach(m => m.reportes.forEach(r => all.push({ ...r, mes: m.nombre, tipo: c.label }))));
-            return all;
+        function getAllGrupos() {
+            const grupos = [];
+            CATALOGOS.forEach(c => c.meses.forEach(m => {
+                if (m.permisoId) grupos.push({ permisoId: m.permisoId, nombre: m.nombre, tipo: c.label });
+            }));
+            return grupos;
         }
 
         // ── Auth check ────────────────────────────────────────────────────────
@@ -390,14 +392,14 @@
         function renderTabla() {
             const users = getUsers();
             const tbody = document.getElementById('tbody-usuarios');
-            const allReportes = getAllReportes();
+            const allGrupos = getAllGrupos();
             tbody.innerHTML = '';
 
             Object.entries(users).forEach(([username, user]) => {
                 const isAdmin = user.role === 'admin';
                 const repCount = isAdmin
-                    ? `<strong>${allReportes.length > 0 ? 'Todos' : '—'}</strong>`
-                    : `<strong>${(user.reportes || []).length}</strong> / ${allReportes.length}`;
+                    ? `<strong>Todos</strong>`
+                    : `<strong>${(user.reportes || []).length}</strong> / ${allGrupos.length}`;
                 const esYo = username === session.usuario;
 
                 const tr = document.createElement('tr');
@@ -417,36 +419,37 @@
             });
         }
 
-        // ── Render checkboxes de reportes ─────────────────────────────────────
-        function renderCheckboxes(reportesAsignados) {
+        // ── Render checkboxes por acordeón ───────────────────────────────────
+        function renderCheckboxes(permisosAsignados) {
             const container = document.getElementById('reportes-checkboxes');
             container.innerHTML = '';
-            let hayReportes = false;
+            let hayGrupos = false;
 
             CATALOGOS.forEach(cat => {
+                const group = document.createElement('div');
+                group.className = 'reportes-group';
+                group.innerHTML = `<div class="reportes-group-name">${cat.label}</div>`;
+                let tieneItems = false;
+
                 cat.meses.forEach(mes => {
-                    if (mes.reportes.length === 0) return;
-                    hayReportes = true;
-                    const group = document.createElement('div');
-                    group.className = 'reportes-group';
-                    group.innerHTML = `<div class="reportes-group-name">${cat.label} · ${mes.nombre}</div>`;
-                    mes.reportes.forEach(r => {
-                        const checked = reportesAsignados.includes(r.id) ? 'checked' : '';
-                        const item = document.createElement('label');
-                        item.className = 'check-item';
-                        item.innerHTML = `
-                            <input type="checkbox" value="${r.id}" ${checked}>
-                            <span>${r.num} ${r.titulo}</span>
-                            <span class="check-fecha">${r.fecha}</span>
-                        `;
-                        group.appendChild(item);
-                    });
-                    container.appendChild(group);
+                    if (!mes.permisoId) return;
+                    tieneItems = true;
+                    hayGrupos = true;
+                    const checked = permisosAsignados.includes(mes.permisoId) ? 'checked' : '';
+                    const item = document.createElement('label');
+                    item.className = 'check-item';
+                    item.innerHTML = `
+                        <input type="checkbox" value="${mes.permisoId}" ${checked}>
+                        <span>${mes.nombre}</span>
+                    `;
+                    group.appendChild(item);
                 });
+
+                if (tieneItems) container.appendChild(group);
             });
 
-            if (!hayReportes) {
-                container.innerHTML = '<p class="no-reportes">No hay reportes disponibles en el catálogo aún.</p>';
+            if (!hayGrupos) {
+                container.innerHTML = '<p class="no-reportes">No hay secciones disponibles en el catálogo aún.</p>';
             }
         }
 
