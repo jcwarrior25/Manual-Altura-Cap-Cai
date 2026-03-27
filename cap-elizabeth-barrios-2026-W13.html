@@ -1,0 +1,251 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Reporte CAP — Elizabeth Barrios — 2026-W13</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Roboto,sans-serif;background:#f8f9fa;min-height:100vh}
+  .gate{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#4d0d17,#701321)}
+  .gate-box{background:#fff;border-radius:16px;padding:40px;max-width:360px;width:90%;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+  .gate-box h2{color:#701321;font-size:1.1rem;margin-bottom:6px}
+  .gate-box p{color:#888;font-size:.8rem;margin-bottom:20px}
+  .gate-box input{width:100%;padding:12px;border:2px solid #e0d5c5;border-radius:8px;font-size:.9rem;text-align:center;outline:none}
+  .gate-box input:focus{border-color:#d4af37}
+  .gate-box button{width:100%;padding:12px;background:#701321;color:#fff;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;margin-top:12px}
+  .gate-box button:hover{background:#8e1a2a}
+  .gate-box .err{color:#e53e3e;font-size:.75rem;margin-top:8px;display:none}
+  #report{display:none}
+</style></head><body>
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <h2>Reporte Individual</h2>
+    <p>Elizabeth Barrios</p>
+    <input type="password" id="pw" placeholder="Contraseña" onkeydown="if(event.key==='Enter')check()">
+    <button onclick="check()">Acceder</button>
+    <p class="err" id="err">Contraseña incorrecta</p>
+  </div>
+</div>
+<div id="report">
+
+
+
+
+<div class="container">
+  <a href="reportes.html" class="back-link">← Todos los reportes</a>
+
+  <header class="page-header fade-in">
+    <h1>Reporte Semanal CRM</h1>
+    <div class="subtitle" id="weekLabel"></div>
+  </header>
+
+  <div class="meta-bar fade-in d1">
+    <div><span class="label">Semana:</span> <span id="metaWeek"></span></div>
+    <div><span class="label">Extraído:</span> <span id="metaDate"></span></div>
+    <div><span class="label">Fuente:</span> GHL API (Admisiones NWL)</div>
+    <div><span class="label">Pipeline:</span> cPCXiO9ps2rbFPNvHWHG</div>
+  </div>
+
+  <!-- Summary -->
+  <div class="card fade-in d2">
+    <div class="card-head"><h2>Resumen de la Semana</h2></div>
+    <div class="card-body"><p class="summary-text" id="summary"></p></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid fade-in d2" id="kpiGrid"></div>
+
+  <!-- Leads por día chart -->
+  <div class="card fade-in d3">
+    <div class="card-head"><h2>Volumen de Leads por Día</h2></div>
+    <div class="card-body"><div class="chart-container"><canvas id="leadsChart"></canvas></div></div>
+  </div>
+
+  <!-- Fuentes -->
+  <div class="card fade-in d3">
+    <div class="card-head"><h2>Fuentes de Leads</h2></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div><div class="chart-container"><canvas id="sourcesChart"></canvas></div></div>
+        <div><table id="sourcesTable"><thead><tr><th>Fuente</th><th class="text-right">Cantidad</th><th class="text-right">%</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pipeline -->
+  <div class="card fade-in d3">
+    <div class="card-head"><h2>Pipeline — Distribución por Etapa</h2></div>
+    <div class="card-body">
+      <table id="pipelineTable"><thead><tr><th>Etapa</th><th class="text-right">Total</th><th class="text-right">Abiertos</th><th class="text-right">%</th></tr></thead><tbody></tbody></table>
+      <div id="pipelineStatus" style="margin-top:12px;font-size:.82rem;"></div>
+    </div>
+  </div>
+
+  <!-- Campus -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Reportes por Campus</h2></div>
+    <div class="card-body"><div class="campus-grid" id="campusGrid"></div></div>
+  </div>
+
+  <!-- CAP Performance -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Métricas por CAP</h2></div>
+    <div class="card-body"><table id="capTable"><thead><tr><th>CAP</th><th>Campus</th><th class="text-right">Activos</th><th class="text-right">Won</th><th class="text-right">Win%</th><th class="text-right">Loss%</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Alertas y Banderas</h2></div>
+    <div class="card-body" id="alertsContainer"></div>
+  </div>
+
+  <!-- Priorities -->
+  <div class="card fade-in d5">
+    <div class="card-head"><h2>Prioridades Próxima Semana</h2></div>
+    <div class="card-body"><ol id="prioritiesList" style="padding-left:18px;font-size:.88rem;line-height:1.8;"></ol></div>
+  </div>
+
+  <!-- Data Quality -->
+  <div class="card fade-in d5">
+    <div class="card-head"><h2>Calidad de Datos</h2></div>
+    <div class="card-body"><table id="qualityTable"><thead><tr><th>Indicador</th><th class="text-right">Valor</th><th class="text-center">Estado</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- Individual CAP Sections -->
+  <div id="capSections"></div>
+
+  <div class="footer">
+    <p>Reporte generado por ALTURA Performance Marketing</p>
+    <p>Pipeline ID: cPCXiO9ps2rbFPNvHWHG</p>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// REPORT_DATA — This is what Ops fills. Everything below renders from it.
+// ══════════════════════════════════════════════════════════════════════
+const D = {"weekLabel":"Colegio Newland (NWL) — Semana W13 (V2) — Elizabeth Barrios","weekRange":"Mar 23–29, 2026","extractedAt":"2026-03-27 CST","summary":"Reporte individual de Elizabeth Barrios — Corregidora","kpis":[],"capSections":[{"name":"Elizabeth Barrios","campus":"Corregidora","weeklyMetrics":[{"label":"Oportunidades activas","current":"91","prev":"—","delta":"—"},{"label":"Leads nuevos","current":"9","prev":"—","delta":"—"},{"label":"Inscripciones","current":"0","prev":"—","delta":"—"},{"label":"Perdidos (tw)","current":"2","prev":"—","delta":"—"},{"label":"Calificado/Nuevo sin agendar","current":"53","prev":"—","delta":"—"},{"label":"Post-visita","current":"11","prev":"—","delta":"—"},{"label":"No-shows acumulados","current":"3","prev":"—","delta":"—"}],"conversations":[{"leadName":"Valeria","stage":"Calificado","messageCount":29,"outbound":17,"inbound":10,"context":"Interesada en Prepa Corregidora. Conversación casi 100% sistema/NORA. 2 meses sin mover.","highlight":"\"Hola Valeria 🦘, Soy Elizabeth Barrios de Colegio Newland. Por el perfil de tu familia, podrían ser elegibles para el programa B.E. Newland...\""},{"leadName":"Giselle Tapia","stage":"Calificado","messageCount":5,"outbound":4,"inbound":0,"context":"Lead Secundaria. 4 mensajes salientes, 0 respuestas. Todo automatizado.","highlight":"\"🌟 ¡Ven a vivir una mañana increíble en NWL! 🦘🌟 Te invitamos a nuestro Open House este viernes 27...\""}],"strengths":["Loss% baja (7.5%) — retiene pipeline, aunque retener sin avanzar es acumular inventario muerto","Programa B.E. como gancho tiene potencial — pero es blast del sistema, no uso estratégico en conversación 1:1"],"improvements":["🚨 EMERGENCIA: Sin los blasts del sistema (B.E., Open House, NORA), Elizabeth tiene CERO mensajes personales en las 2 conversaciones revisadas. Valeria es 100% NORA — 2 meses en Calificado sin seguimiento personal","Giselle: 4 mensajes en 7 días, todos genéricos, 0 respuestas, nunca cambió de canal. Enviar mensaje → esperar → spam genérico → esperar. No es vender, es spamear","Comparación: Ana Isabel 15.1% win, Delia 6.1% con campus difícil — ambas TRIPLICAN+ el cierre de Elizabeth. 120 opps, 1 inscripción es estadísticamente improbable si hay esfuerzo real","🚨 91 activas con 53 en Calificado + 11 post-visita = pipeline vivo sin nadie trabajándolo"],"focus":"🚨 Sesión 1:1 con supervisora ESTA SEMANA. Revisar 11 post-visita: ¿se contactó después? Shadowing con Ana Isabel 1 día. Llamar a 5 más recientes en Calificado — sin script, pregunta simple.","rating":"3/10 — Bot de Difusión"}]};
+
+if (!D) { document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#999;">No report data loaded.</div>'; }
+else { render(D); }
+
+// Safe value helper — never show null/undefined
+function v(val, fallback) { return (val === null || val === undefined || val === 'null' || val === 'undefined') ? (fallback !== undefined ? fallback : '—') : val; }
+
+function render(d) {
+  // Meta
+  document.getElementById('weekLabel').textContent = v(d.weekLabel, '');
+  document.getElementById('metaWeek').textContent = v(d.weekRange, '');
+  document.getElementById('metaDate').textContent = v(d.extractedAt, '');
+  document.getElementById('summary').innerHTML = v(d.summary, '');
+
+  // KPIs
+  const kpiGrid = document.getElementById('kpiGrid');
+  (d.kpis || []).forEach(k => {
+    const val = v(k.value, '—');
+    const delta = k.delta;
+    const cls = delta > 0 ? 'delta-up' : delta < 0 ? 'delta-down' : 'delta-neutral';
+    const sign = delta > 0 ? '+' : '';
+    kpiGrid.innerHTML += `<div class="kpi"><div class="num">${val}</div><div class="lbl">${v(k.label)}</div>${delta !== null && delta !== undefined ? `<div class="delta ${cls}">${sign}${delta} vs sem ant</div>` : ''}</div>`;
+  });
+
+  // Leads by day chart
+  if (d.leadsByDay) {
+    new Chart(document.getElementById('leadsChart'), {
+      type: 'bar', data: { labels: d.leadsByDay.labels || [], datasets: [{ label: 'Leads', data: (d.leadsByDay.values || []).map(x => x || 0), backgroundColor: '#701321cc', borderRadius: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+  }
+
+  // Sources
+  if (d.sources && d.sources.length > 0) {
+    const tbody = document.querySelector('#sourcesTable tbody');
+    const total = d.sources.reduce((s,x) => s + (x.count || 0), 0) || 1;
+    d.sources.forEach(s => { tbody.innerHTML += `<tr><td>${v(s.name)}</td><td class="text-right">${v(s.count, 0)}</td><td class="text-right">${Math.round((s.count||0)/total*100)}%</td></tr>`; });
+    new Chart(document.getElementById('sourcesChart'), {
+      type: 'doughnut', data: { labels: d.sources.map(s => v(s.name)), datasets: [{ data: d.sources.map(s => s.count || 0), backgroundColor: ['#701321','#8e1a2a','#b38e1d','#d4af37','#F4E4C1','#4d0d17','#a0522d','#cd853f'] }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+    });
+  }
+
+  // Pipeline
+  if (d.pipeline) {
+    const tbody = document.querySelector('#pipelineTable tbody');
+    const totalOpen = d.pipeline.reduce((s,p) => s + (p.open||0), 0) || 1;
+    d.pipeline.forEach(p => { tbody.innerHTML += `<tr><td>${v(p.stage)}</td><td class="text-right">${v(p.total, 0)}</td><td class="text-right">${v(p.open, 0)}</td><td class="text-right">${Math.round((p.open||0)/totalOpen*100)}%</td></tr>`; });
+    if (d.pipelineStatus) document.getElementById('pipelineStatus').innerHTML = d.pipelineStatus;
+  }
+
+  // Campus
+  if (d.campuses) {
+    const grid = document.getElementById('campusGrid');
+    d.campuses.forEach(c => {
+      grid.innerHTML += `<div class="campus-card"><h3>📍 ${v(c.name)}</h3>
+        ${(c.stats||[]).map(s => `<div class="campus-stat"><span>${v(s.label)}</span><span><strong>${v(s.value, '—')}</strong></span></div>`).join('')}
+        ${c.notes ? `<p style="margin-top:8px;font-size:.8rem;color:#666;">${c.notes}</p>` : ''}
+      </div>`;
+    });
+  }
+
+  // CAP table
+  if (d.caps) {
+    const tbody = document.querySelector('#capTable tbody');
+    d.caps.forEach(c => { tbody.innerHTML += `<tr><td>${v(c.name)}</td><td>${v(c.campus)}</td><td class="text-right">${v(c.active, 0)}</td><td class="text-right">${v(c.won, 0)}</td><td class="text-right">${v(c.winPct, '—')}%</td><td class="text-right">${v(c.lossPct, '—')}%</td></tr>`; });
+  }
+
+  // Alerts
+  if (d.alerts) {
+    const container = document.getElementById('alertsContainer');
+    d.alerts.forEach(a => {
+      const cls = a.level === 'red' ? 'alert-red' : a.level === 'yellow' ? 'alert-yellow' : 'alert-green';
+      const icon = a.level === 'red' ? '🔴' : a.level === 'yellow' ? '⚠️' : '✅';
+      container.innerHTML += `<div class="alert ${cls}">${icon} ${a.text}</div>`;
+    });
+  }
+
+  // Priorities
+  if (d.priorities) {
+    const ol = document.getElementById('prioritiesList');
+    d.priorities.forEach(p => { ol.innerHTML += `<li><strong>${p}</strong></li>`; });
+  }
+
+  // Data quality
+  if (d.dataQuality) {
+    const tbody = document.querySelector('#qualityTable tbody');
+    d.dataQuality.forEach(q => {
+      const icon = q.status === 'good' ? '✅' : q.status === 'warn' ? '⚠️' : '🔴';
+      tbody.innerHTML += `<tr><td>${v(q.label)}</td><td class="text-right">${v(q.value)}</td><td class="text-center">${icon}</td></tr>`;
+    });
+  }
+
+  // Individual CAP sections
+  if (d.capSections && d.capSections.length > 0) {
+    const container = document.getElementById('capSections');
+    container.innerHTML = '<div class="card fade-in d5"><div class="card-head"><h2>Secciones Individuales CAP</h2></div><div class="card-body">' +
+      d.capSections.map(cap => `
+        <div class="cap-section">
+          <div class="cap-header"><h3>${v(cap.name)}</h3><span class="campus-tag">📍 ${v(cap.campus)}</span></div>
+          <table style="margin-bottom:12px;"><thead><tr><th>Métrica</th><th class="text-right">Sem Ant</th><th class="text-right">Esta Sem</th><th class="text-right">Δ</th></tr></thead><tbody>
+            ${(cap.weeklyMetrics||[]).map(m => `<tr><td>${v(m.label)}</td><td class="text-right">${v(m.prev)}</td><td class="text-right">${v(m.current)}</td><td class="text-right">${v(m.delta)}</td></tr>`).join('')}
+          </tbody></table>
+          ${(cap.conversations||[]).map(conv => `
+            <div class="conv-review">
+              <div class="conv-name">${v(conv.leadName)}</div>
+              <div class="conv-meta">Etapa: ${v(conv.stage)} · ${v(conv.messageCount, 0)} mensajes (${v(conv.outbound, 0)} salientes / ${v(conv.inbound, 0)} entrantes)</div>
+              <p style="font-size:.82rem;margin:6px 0;">${v(conv.context, '')}</p>
+              <blockquote>${v(conv.highlight, 'Sin extracto disponible.')}</blockquote>
+            </div>
+          `).join('')}
+          ${cap.strengths ? `<h4 style="font-size:.85rem;color:#2e7d32;margin:12px 0 6px;">Lo Que Se Está Haciendo Bien</h4><ul style="padding-left:18px;font-size:.82rem;">${cap.strengths.map(s=>`<li>${s}</li>`).join('')}</ul>` : ''}
+          ${cap.improvements ? `<h4 style="font-size:.85rem;color:var(--color-primario);margin:12px 0 6px;">Oportunidades de Mejora</h4><ul style="padding-left:18px;font-size:.82rem;">${cap.improvements.map(s=>`<li>${s}</li>`).join('')}</ul>` : ''}
+          ${cap.focus ? `<h4 style="font-size:.85rem;color:var(--color-oro);margin:12px 0 6px;">Foco Próxima Semana</h4><p style="font-size:.82rem;">${cap.focus}</p>` : ''}
+        </div>
+      `).join('') +
+    '</div></div>';
+  }
+}
+</script>
+
+
+
+</div>
+<script>
+function check(){var p=document.getElementById('pw').value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(p==='elizabeth'){document.getElementById('gate').style.display='none';document.getElementById('report').style.display='block';}else{document.getElementById('err').style.display='block';}}
+</script></body></html>
