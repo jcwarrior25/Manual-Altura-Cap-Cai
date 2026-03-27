@@ -104,8 +104,6 @@
     <div><span class="label">Pipeline:</span> cPCXiO9ps2rbFPNvHWHG</div>
   </div>
 
-  <!-- General sections (hidden for CAP-only reports) -->
-  <div id="generalSections">
   <!-- Summary -->
   <div class="card fade-in d2">
     <div class="card-head"><h2>Resumen de la Semana</h2></div>
@@ -171,8 +169,6 @@
     <div class="card-body"><table id="qualityTable"><thead><tr><th>Indicador</th><th class="text-right">Valor</th><th class="text-center">Estado</th></tr></thead><tbody></tbody></table></div>
   </div>
 
-  </div><!-- /generalSections -->
-
   <!-- Individual CAP Sections -->
   <div id="capSections"></div>
 
@@ -195,11 +191,13 @@ else { render(D); }
 function v(val, fallback) { return (val === null || val === undefined || val === 'null' || val === 'undefined') ? (fallback !== undefined ? fallback : '—') : val; }
 
 function render(d) {
-  // Detect CAP-only report: has capSections but no pipeline/sources data
+  // Detect CAP-only report: has capSections but no general data
   const isCapOnly = d.capSections && d.capSections.length > 0 && (!d.pipeline || d.pipeline.length === 0) && (!d.sources || d.sources.length === 0);
   if (isCapOnly) {
-    document.getElementById('generalSections').style.display = 'none';
-    document.querySelector('.meta-bar').style.display = 'none';
+    // Hide ALL general sections — only show header + CAP sections
+    document.querySelectorAll('.card, .meta-bar, .kpi-grid').forEach(el => el.style.display = 'none');
+    // Show only the capSections container
+    document.getElementById('capSections').style.display = '';
   }
 
   // Meta
