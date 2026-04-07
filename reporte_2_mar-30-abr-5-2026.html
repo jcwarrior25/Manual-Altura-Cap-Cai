@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte Semanal CRM — {{WEEK_LABEL}}</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --color-fondo: #f8f9fa;
+      --color-primario: #701321;
+      --color-primario-light: #8e1a2a;
+      --color-primario-dark: #4d0d17;
+      --color-oro: #b38e1d;
+      --color-oro-brillante: #d4af37;
+      --color-oro-suave: #F4E4C1;
+      --texto-oscuro: #2d0a0a;
+      --texto-claro: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: radial-gradient(circle at center, #fff 0%, #f0f0f0 100%); color: var(--texto-oscuro); min-height: 100vh; padding: 20px; }
+    .container { max-width: 960px; margin: 0 auto; }
+    .fade-in { opacity: 0; transform: translateY(16px); animation: fadeUp .5s ease-out forwards; }
+    @keyframes fadeUp { to { opacity:1; transform:none; } }
+    .d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}.d4{animation-delay:.4s}.d5{animation-delay:.5s}
+
+    .page-header { text-align:center; margin-bottom:32px; }
+    .page-header h1 { font-size:1.8rem; letter-spacing:3px; color:var(--color-primario); text-transform:uppercase; border-bottom:3px solid var(--color-oro); padding-bottom:10px; display:inline-block; }
+    .page-header .subtitle { font-size:.85rem; color:#888; margin-top:8px; }
+
+    .meta-bar { display:flex; gap:24px; flex-wrap:wrap; background:#fff; border-radius:12px; padding:16px 20px; margin-bottom:24px; box-shadow:0 2px 8px rgba(0,0,0,.06); font-size:.8rem; }
+    .meta-bar .label { font-weight:700; color:var(--color-primario); }
+
+    .card { background:#fff; border-radius:14px; box-shadow:0 4px 16px rgba(0,0,0,.06); margin-bottom:20px; overflow:hidden; }
+    .card-head { padding:18px 22px; border-bottom:1px solid #f0e8d0; }
+    .card-head h2 { font-size:1rem; font-weight:700; color:var(--color-primario); }
+    .card-head .badge { font-size:.7rem; padding:3px 10px; border-radius:20px; font-weight:600; }
+    .badge-red { background:var(--color-primario); color:#fff; }
+    .badge-gold { background:var(--color-oro-suave); color:var(--color-oro); }
+    .badge-green { background:#e8f5e9; color:#2e7d32; }
+    .card-body { padding:20px 22px; }
+
+    .summary-text { font-size:.9rem; line-height:1.7; margin-bottom:12px; }
+    .summary-text strong { color:var(--color-primario); }
+
+    .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:16px 0; }
+    .kpi { text-align:center; padding:16px 8px; border-radius:12px; background:var(--color-oro-suave); }
+    .kpi .num { font-size:1.6rem; font-weight:800; color:var(--color-primario); }
+    .kpi .lbl { font-size:.7rem; color:#666; margin-top:2px; }
+    .kpi .delta { font-size:.65rem; margin-top:4px; }
+    .delta-up { color:#2e7d32; }
+    .delta-down { color:var(--color-primario); }
+    .delta-neutral { color:#888; }
+
+    table { width:100%; border-collapse:collapse; font-size:.82rem; }
+    th { background:var(--color-primario); color:#fff; padding:10px 14px; text-align:left; font-weight:600; }
+    td { padding:9px 14px; border-bottom:1px solid #f0e8d0; }
+    tr:hover td { background:#faf6f0; }
+    .text-right { text-align:right; }
+    .text-center { text-align:center; }
+
+    .alert { padding:12px 16px; border-radius:10px; margin:8px 0; font-size:.82rem; }
+    .alert-red { background:#fce4e4; border-left:4px solid var(--color-primario); }
+    .alert-yellow { background:#fff8e1; border-left:4px solid var(--color-oro); }
+    .alert-green { background:#e8f5e9; border-left:4px solid #2e7d32; }
+
+    .campus-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+    .campus-card { border:1px solid #f0e8d0; border-radius:12px; padding:16px; }
+    .campus-card h3 { font-size:.9rem; color:var(--color-primario); margin-bottom:10px; }
+    .campus-stat { display:flex; justify-content:space-between; padding:4px 0; font-size:.8rem; border-bottom:1px solid #faf6f0; }
+    .campus-stat:last-child { border-bottom:none; }
+
+    .cap-section { border:1px solid #f0e8d0; border-radius:14px; padding:20px; margin-bottom:16px; }
+    .cap-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .cap-header h3 { font-size:.95rem; color:var(--color-primario); }
+    .cap-header .campus-tag { font-size:.7rem; padding:3px 10px; border-radius:20px; background:var(--color-oro-suave); color:var(--color-oro); font-weight:600; }
+    .conv-review { background:#faf8f4; border-radius:10px; padding:14px; margin:10px 0; }
+    .conv-review .conv-name { font-weight:700; font-size:.85rem; color:var(--color-primario); }
+    .conv-review .conv-meta { font-size:.75rem; color:#888; margin:4px 0 8px; }
+    .conv-review blockquote { border-left:3px solid var(--color-oro); padding:8px 12px; margin:8px 0; font-style:italic; font-size:.82rem; color:#555; background:rgba(179,142,29,.05); border-radius:0 8px 8px 0; }
+
+    .chart-container { height:220px; margin:12px 0; }
+    .footer { text-align:center; padding:32px 0 16px; font-size:.75rem; color:#aaa; }
+    .back-link { display:inline-block; margin-bottom:20px; color:var(--color-primario); text-decoration:none; font-size:.85rem; font-weight:600; }
+    .back-link:hover { text-decoration:underline; }
+
+    @media (max-width:700px) { .kpi-grid{grid-template-columns:repeat(2,1fr)} .campus-grid{grid-template-columns:1fr} }
+    @media print { body{padding:0;background:#fff} .card{box-shadow:none;break-inside:avoid} .back-link{display:none} }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="reportes.html" class="back-link">← Todos los reportes</a>
+
+  <header class="page-header fade-in">
+    <h1>Reporte Semanal CRM</h1>
+    <div class="subtitle" id="weekLabel"></div>
+  </header>
+
+  <div class="meta-bar fade-in d1">
+    <div><span class="label">Semana:</span> <span id="metaWeek"></span></div>
+    <div><span class="label">Extraído:</span> <span id="metaDate"></span></div>
+    <div><span class="label">Fuente:</span> GHL API (Admisiones NWL)</div>
+    <div><span class="label">Pipeline:</span> cPCXiO9ps2rbFPNvHWHG</div>
+  </div>
+
+  <!-- Summary -->
+  <div class="card fade-in d2">
+    <div class="card-head"><h2>Resumen de la Semana</h2></div>
+    <div class="card-body"><p class="summary-text" id="summary"></p></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid fade-in d2" id="kpiGrid"></div>
+
+  <!-- Leads por día chart -->
+  <div class="card fade-in d3">
+    <div class="card-head"><h2>Volumen de Leads por Día</h2></div>
+    <div class="card-body"><div class="chart-container"><canvas id="leadsChart"></canvas></div></div>
+  </div>
+
+  <!-- Fuentes -->
+  <div class="card fade-in d3">
+    <div class="card-head"><h2>Fuentes de Leads</h2></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div><div class="chart-container"><canvas id="sourcesChart"></canvas></div></div>
+        <div><table id="sourcesTable"><thead><tr><th>Fuente</th><th class="text-right">Cantidad</th><th class="text-right">%</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pipeline -->
+  <div class="card fade-in d3">
+    <div class="card-head"><h2>Pipeline — Distribución por Etapa</h2></div>
+    <div class="card-body">
+      <table id="pipelineTable"><thead><tr><th>Etapa</th><th class="text-right">Total</th><th class="text-right">Abiertos</th><th class="text-right">%</th></tr></thead><tbody></tbody></table>
+      <div id="pipelineStatus" style="margin-top:12px;font-size:.82rem;"></div>
+    </div>
+  </div>
+
+  <!-- Campus -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Reportes por Campus</h2></div>
+    <div class="card-body"><div class="campus-grid" id="campusGrid"></div></div>
+  </div>
+
+  <!-- CAP Performance -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Métricas por CAP</h2></div>
+    <div class="card-body"><table id="capTable"><thead><tr><th>CAP</th><th>Campus</th><th class="text-right">Activos</th><th class="text-right">Won</th><th class="text-right">Win%</th><th class="text-right">Loss%</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Alertas y Banderas</h2></div>
+    <div class="card-body" id="alertsContainer"></div>
+  </div>
+
+  <!-- Priorities -->
+  <div class="card fade-in d5">
+    <div class="card-head"><h2>Prioridades Próxima Semana</h2></div>
+    <div class="card-body"><ol id="prioritiesList" style="padding-left:18px;font-size:.88rem;line-height:1.8;"></ol></div>
+  </div>
+
+  <!-- Data Quality -->
+  <div class="card fade-in d5">
+    <div class="card-head"><h2>Calidad de Datos</h2></div>
+    <div class="card-body"><table id="qualityTable"><thead><tr><th>Indicador</th><th class="text-right">Valor</th><th class="text-center">Estado</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- Individual CAP Sections -->
+  <div id="capSections"></div>
+
+  <div class="footer">
+    <p>Reporte generado por ALTURA Performance Marketing</p>
+    <p>Pipeline ID: cPCXiO9ps2rbFPNvHWHG</p>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// REPORT_DATA — This is what Ops fills. Everything below renders from it.
+// ══════════════════════════════════════════════════════════════════════
+const D = {"weekLabel":"Colegio Newland (NWL) — Semana W14","weekRange":"Mar 30 – Abr 5, 2026","extractedAt":"2026-04-07 09:00 CST","summary":"<strong>Semana Santa golpeó duro.</strong> Solo 30 leads nuevos (vs 69 — caída del 57%) y 2 visitas realizadas (vs 22). <strong>Elizabeth Barrios cerró 3 inscripciones en Corregidora</strong> — pasó de 1 a 4 en el ciclo, rompiendo su sequía. Pipeline creció a 489 opps abiertas. <strong>285 en Calificado sin agendar visita.</strong>","kpis":[{"label":"Leads nuevos","value":30,"delta":-39},{"label":"Inscripciones","value":4,"delta":-1},{"label":"Perdidos","value":3,"delta":-22},{"label":"Pipeline activo","value":489,"delta":35}],"leadsByDay":{"labels":["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"],"values":[4,5,1,6,1,1,12]},"sources":[{"name":"Captura Manual","count":9},{"name":"WhatsApp","count":6},{"name":"Sin Clasificar","count":5},{"name":"Instagram","count":2},{"name":"Formulario Web","count":2},{"name":"Direct Traffic","count":2},{"name":"Paid Search","count":1},{"name":"Facebook","count":1},{"name":"Manual / Offline","count":1},{"name":"Sin fuente","count":1}],"pipeline":[{"stage":"Nuevo Lead","total":77,"open":2},{"stage":"Calificado","total":390,"open":285},{"stage":"Cita Agendada","total":26,"open":20},{"stage":"Cita Realizada","total":137,"open":95},{"stage":"Ref Pago Enviada","total":1,"open":1},{"stage":"Pago Confirmado","total":5,"open":5},{"stage":"Evaluación Agendada","total":25,"open":23},{"stage":"Evaluación Realizada","total":24,"open":23},{"stage":"Resultado Entregado","total":19,"open":17},{"stage":"Inscripción En Proceso","total":17,"open":17},{"stage":"Inscrito","total":74,"open":1}],"pipelineStatus":"<strong>Abiertos:</strong> 489 · <strong>Ganados:</strong> 74 · <strong>Perdidos:</strong> 140 · <strong>Abandonados:</strong> 92","campuses":[{"name":"Zibatá","stats":[{"label":"Leads nuevos","value":7},{"label":"Inscripciones","value":1},{"label":"Pipeline activo","value":185}],"notes":"114 en Calificado. Elsa sola con 185 opps."},{"name":"Juriquilla","stats":[{"label":"Leads nuevos","value":13},{"label":"Inscripciones","value":0},{"label":"Pipeline activo","value":100}],"notes":"0 inscripciones por segunda semana. Daniela 2.1% win vs Ana Isabel 14.2%."},{"name":"Corregidora","stats":[{"label":"Leads nuevos","value":6},{"label":"Inscripciones","value":3},{"label":"Pipeline activo","value":95}],"notes":"🎉 Elizabeth cerró 3. 11 en Inscripción En Proceso."},{"name":"Milenio","stats":[{"label":"Leads nuevos","value":2},{"label":"Inscripciones","value":0},{"label":"Pipeline activo","value":58}],"notes":"5 en Pago Confirmado — pipeline avanzado. 2 visitas agendadas."},{"name":"San Miguel de Allende","stats":[{"label":"Leads nuevos","value":1},{"label":"Inscripciones","value":0},{"label":"Pipeline activo","value":47}],"notes":"5 en Resultado Entregado — potencial de cierre post-vacaciones."}],"caps":[{"name":"Elsa Medina","campus":"Zibatá","active":185,"won":40,"winPct":15,"lossPct":8.6},{"name":"Daniela Alamilla","campus":"Juriquilla","active":50,"won":2,"winPct":2.1,"lossPct":38.9},{"name":"Ana Isabel Cervantes","campus":"Juriquilla","active":50,"won":16,"winPct":14.2,"lossPct":22.1},{"name":"Delia Rodriguez","campus":"Milenio","active":58,"won":6,"winPct":5.8,"lossPct":35.6},{"name":"Alberto Rodriguez","campus":"SMA","active":47,"won":6,"winPct":10.5,"lossPct":5.3},{"name":"Elizabeth Barrios","campus":"Corregidora","active":95,"won":4,"winPct":3.1,"lossPct":9.2}],"alerts":[{"level":"yellow","text":"Semana Santa — métricas no comparables 1:1 con semanas normales"},{"level":"red","text":"285 leads en Calificado sin agendar visita (58.3% del pipeline)"},{"level":"green","text":"Elizabeth Barrios: 3 inscripciones esta semana — rompió sequía"},{"level":"yellow","text":"12 leads el domingo — probable blast automatizado sin seguimiento"},{"level":"red","text":"36.7% de leads sin nivel académico identificado"}],"priorities":["Post-vacaciones: activar los 285 en Calificado — meta 10 visitas agendadas","Corregidora: cerrar los 11 en Inscripción En Proceso","Juriquilla: cerrar los 5+1 en Inscripción En Proceso","Investigar los 12 leads del domingo — asegurar seguimiento","Confirmar qué pasó con la etapa No Asistió en el pipeline"],"dataQuality":[{"label":"Leads con fuente identificable","value":"80.0%","status":"warn"},{"label":"Leads con campus asignado","value":"96.7%","status":"good"},{"label":"Leads con nivel académico","value":"63.3%","status":"bad"},{"label":"Registros basura","value":"0","status":"good"}],"capSections":[]};
+
+if (!D) { document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#999;">No report data loaded.</div>'; }
+else { render(D); }
+
+// Safe value helper — never show null/undefined
+function v(val, fallback) { return (val === null || val === undefined || val === 'null' || val === 'undefined') ? (fallback !== undefined ? fallback : '—') : val; }
+
+function render(d) {
+  // Detect CAP-only report: has capSections but no general data
+  const isCapOnly = d.capSections && d.capSections.length > 0 && (!d.pipeline || d.pipeline.length === 0) && (!d.sources || d.sources.length === 0);
+  if (isCapOnly) {
+    // Hide ALL general sections — only show header + CAP sections
+    document.querySelectorAll('.card, .meta-bar, .kpi-grid').forEach(el => el.style.display = 'none');
+    // Show only the capSections container
+    document.getElementById('capSections').style.display = '';
+  }
+
+  // Meta
+  document.getElementById('weekLabel').textContent = v(d.weekLabel, '');
+  document.getElementById('metaWeek').textContent = v(d.weekRange, '');
+  document.getElementById('metaDate').textContent = v(d.extractedAt, '');
+  document.getElementById('summary').innerHTML = v(d.summary, '');
+
+  // KPIs
+  const kpiGrid = document.getElementById('kpiGrid');
+  (d.kpis || []).forEach(k => {
+    const val = v(k.value, '—');
+    const delta = k.delta;
+    const cls = delta > 0 ? 'delta-up' : delta < 0 ? 'delta-down' : 'delta-neutral';
+    const sign = delta > 0 ? '+' : '';
+    kpiGrid.innerHTML += `<div class="kpi"><div class="num">${val}</div><div class="lbl">${v(k.label)}</div>${delta !== null && delta !== undefined ? `<div class="delta ${cls}">${sign}${delta} vs sem ant</div>` : ''}</div>`;
+  });
+
+  // Leads by day chart
+  if (d.leadsByDay) {
+    new Chart(document.getElementById('leadsChart'), {
+      type: 'bar', data: { labels: d.leadsByDay.labels || [], datasets: [{ label: 'Leads', data: (d.leadsByDay.values || []).map(x => x || 0), backgroundColor: '#701321cc', borderRadius: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+  }
+
+  // Sources
+  if (d.sources && d.sources.length > 0) {
+    const tbody = document.querySelector('#sourcesTable tbody');
+    const total = d.sources.reduce((s,x) => s + (x.count || 0), 0) || 1;
+    d.sources.forEach(s => { tbody.innerHTML += `<tr><td>${v(s.name)}</td><td class="text-right">${v(s.count, 0)}</td><td class="text-right">${Math.round((s.count||0)/total*100)}%</td></tr>`; });
+    new Chart(document.getElementById('sourcesChart'), {
+      type: 'doughnut', data: { labels: d.sources.map(s => v(s.name)), datasets: [{ data: d.sources.map(s => s.count || 0), backgroundColor: ['#701321','#8e1a2a','#b38e1d','#d4af37','#F4E4C1','#4d0d17','#a0522d','#cd853f'] }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+    });
+  }
+
+  // Pipeline
+  if (d.pipeline) {
+    const tbody = document.querySelector('#pipelineTable tbody');
+    const totalOpen = d.pipeline.reduce((s,p) => s + (p.open||0), 0) || 1;
+    d.pipeline.forEach(p => { tbody.innerHTML += `<tr><td>${v(p.stage)}</td><td class="text-right">${v(p.total, 0)}</td><td class="text-right">${v(p.open, 0)}</td><td class="text-right">${Math.round((p.open||0)/totalOpen*100)}%</td></tr>`; });
+    if (d.pipelineStatus) document.getElementById('pipelineStatus').innerHTML = d.pipelineStatus;
+  }
+
+  // Campus
+  if (d.campuses) {
+    const grid = document.getElementById('campusGrid');
+    d.campuses.forEach(c => {
+      grid.innerHTML += `<div class="campus-card"><h3>📍 ${v(c.name)}</h3>
+        ${(c.stats||[]).map(s => `<div class="campus-stat"><span>${v(s.label)}</span><span><strong>${v(s.value, '—')}</strong></span></div>`).join('')}
+        ${c.notes ? `<p style="margin-top:8px;font-size:.8rem;color:#666;">${c.notes}</p>` : ''}
+      </div>`;
+    });
+  }
+
+  // CAP table
+  if (d.caps) {
+    const tbody = document.querySelector('#capTable tbody');
+    d.caps.forEach(c => { tbody.innerHTML += `<tr><td>${v(c.name)}</td><td>${v(c.campus)}</td><td class="text-right">${v(c.active, 0)}</td><td class="text-right">${v(c.won, 0)}</td><td class="text-right">${v(c.winPct, '—')}%</td><td class="text-right">${v(c.lossPct, '—')}%</td></tr>`; });
+  }
+
+  // Alerts
+  if (d.alerts) {
+    const container = document.getElementById('alertsContainer');
+    d.alerts.forEach(a => {
+      const cls = a.level === 'red' ? 'alert-red' : a.level === 'yellow' ? 'alert-yellow' : 'alert-green';
+      const icon = a.level === 'red' ? '🔴' : a.level === 'yellow' ? '⚠️' : '✅';
+      container.innerHTML += `<div class="alert ${cls}">${icon} ${a.text}</div>`;
+    });
+  }
+
+  // Priorities
+  if (d.priorities) {
+    const ol = document.getElementById('prioritiesList');
+    d.priorities.forEach(p => { ol.innerHTML += `<li><strong>${p}</strong></li>`; });
+  }
+
+  // Data quality
+  if (d.dataQuality) {
+    const tbody = document.querySelector('#qualityTable tbody');
+    d.dataQuality.forEach(q => {
+      const icon = q.status === 'good' ? '✅' : q.status === 'warn' ? '⚠️' : '🔴';
+      tbody.innerHTML += `<tr><td>${v(q.label)}</td><td class="text-right">${v(q.value)}</td><td class="text-center">${icon}</td></tr>`;
+    });
+  }
+
+  // Individual CAP sections
+  if (d.capSections && d.capSections.length > 0) {
+    const container = document.getElementById('capSections');
+    container.innerHTML = '<div class="card fade-in d5"><div class="card-head"><h2>Secciones Individuales CAP</h2></div><div class="card-body">' +
+      d.capSections.map(cap => `
+        <div class="cap-section">
+          <div class="cap-header"><h3>${v(cap.name)}</h3><span class="campus-tag">📍 ${v(cap.campus)}</span></div>
+          <table style="margin-bottom:12px;"><thead><tr><th>Métrica</th><th class="text-right">Sem Ant</th><th class="text-right">Esta Sem</th><th class="text-right">Δ</th></tr></thead><tbody>
+            ${(cap.weeklyMetrics||[]).map(m => `<tr><td>${v(m.label)}</td><td class="text-right">${v(m.prev)}</td><td class="text-right">${v(m.current)}</td><td class="text-right">${v(m.delta)}</td></tr>`).join('')}
+          </tbody></table>
+          ${(cap.conversations||[]).map(conv => `
+            <div class="conv-review">
+              <div class="conv-name">${v(conv.leadName)}</div>
+              <div class="conv-meta">Etapa: ${v(conv.stage)} · ${v(conv.messageCount, 0)} mensajes (${v(conv.outbound, 0)} salientes / ${v(conv.inbound, 0)} entrantes)</div>
+              <p style="font-size:.82rem;margin:6px 0;">${v(conv.context, '')}</p>
+              <blockquote>${v(conv.highlight, 'Sin extracto disponible.')}</blockquote>
+            </div>
+          `).join('')}
+          ${cap.strengths ? `<h4 style="font-size:.85rem;color:#2e7d32;margin:12px 0 6px;">Lo Que Se Está Haciendo Bien</h4><ul style="padding-left:18px;font-size:.82rem;">${cap.strengths.map(s=>`<li>${s}</li>`).join('')}</ul>` : ''}
+          ${cap.improvements ? `<h4 style="font-size:.85rem;color:var(--color-primario);margin:12px 0 6px;">Oportunidades de Mejora</h4><ul style="padding-left:18px;font-size:.82rem;">${cap.improvements.map(s=>`<li>${s}</li>`).join('')}</ul>` : ''}
+          ${cap.focus ? `<h4 style="font-size:.85rem;color:var(--color-oro);margin:12px 0 6px;">Foco Próxima Semana</h4><p style="font-size:.82rem;">${cap.focus}</p>` : ''}
+        </div>
+      `).join('') +
+    '</div></div>';
+  }
+}
+</script>
+</body>
+</html>
