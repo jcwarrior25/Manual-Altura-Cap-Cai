@@ -295,9 +295,24 @@
                 <p class="form-hint" id="f-usuario-hint">El nombre de usuario no se puede cambiar.</p>
             </div>
 
+            <div class="form-group" id="grupo-password-actual" style="display:none">
+                <label>Contraseña actual</label>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <input type="text" id="f-password-actual" disabled
+                        style="flex:1;background:#f9f5ff;border-color:#d8c0f0;color:#3f0d54;font-family:monospace;font-weight:700;letter-spacing:0.05em">
+                </div>
+                <p class="form-hint">Contraseña almacenada actualmente para este usuario.</p>
+            </div>
+
             <div class="form-group">
-                <label>Contraseña <span style="font-weight:400;color:#aaa">(dejar en blanco para no cambiar)</span></label>
-                <input type="password" id="f-password" placeholder="Nueva contraseña">
+                <label>Nueva contraseña <span style="font-weight:400;color:#aaa">(dejar en blanco para no cambiar)</span></label>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <input type="password" id="f-password" placeholder="Nueva contraseña" style="flex:1">
+                    <button type="button" onclick="toggleVerPassword()" title="Ver/ocultar"
+                        style="background:none;border:1px solid #e0d0b0;border-radius:8px;padding:8px 12px;cursor:pointer;color:#888;font-size:0.8rem;white-space:nowrap">
+                        👁 Ver
+                    </button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -476,6 +491,18 @@
         // ── Modal ─────────────────────────────────────────────────────────────
         let modoEdicion = null; // username o null si es nuevo
 
+        function toggleVerPassword() {
+            const input = document.getElementById('f-password');
+            const btn = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈 Ocultar';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁 Ver';
+            }
+        }
+
         function abrirModalNuevo() {
             modoEdicion = null;
             document.getElementById('modal-titulo').textContent = 'Nuevo Usuario';
@@ -484,8 +511,11 @@
             document.getElementById('f-usuario').disabled = false;
             document.getElementById('f-usuario-hint').textContent = 'Nombre de usuario para iniciar sesión.';
             document.getElementById('f-password').value = '';
+            document.getElementById('f-password').type = 'password';
             document.getElementById('f-rol').value = 'user';
             document.getElementById('alert-success').classList.remove('show');
+            document.getElementById('grupo-password-actual').style.display = 'none';
+            document.getElementById('f-password-actual').value = '';
             renderCheckboxes([]);
             document.getElementById('reportes-section').style.display = 'block';
             document.getElementById('modal').classList.add('active');
@@ -501,8 +531,12 @@
             document.getElementById('f-usuario').disabled = true;
             document.getElementById('f-usuario-hint').textContent = 'El nombre de usuario no se puede cambiar.';
             document.getElementById('f-password').value = '';
+            document.getElementById('f-password').type = 'password';
             document.getElementById('f-rol').value = user.role;
             document.getElementById('alert-success').classList.remove('show');
+            // Mostrar contraseña actual
+            document.getElementById('grupo-password-actual').style.display = 'block';
+            document.getElementById('f-password-actual').value = user.password || '(sin contraseña)';
             const esAdmin = user.role === 'admin';
             document.getElementById('reportes-section').style.display = esAdmin ? 'none' : 'block';
             renderCheckboxes(user.reportes || []);
