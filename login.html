@@ -181,11 +181,17 @@
                 password: "alberto2026",
                 role: "user",
                 reportes: ["cap-alberto-rodriguez"]
+            },
+            "elizabeth.barrios": {
+                nombre: "Elizabeth Barrios",
+                password: "elizabeth2026",
+                role: "user",
+                reportes: ["cap-elizabeth-barrios"]
             }
         };
 
         // Re-seed si cambia la versión del sistema de permisos
-        const NWL_VERSION = "3";
+        const NWL_VERSION = "4";
         if (localStorage.getItem('nwl_version') !== NWL_VERSION) {
             localStorage.setItem('nwl_users', JSON.stringify(USUARIOS_DEFAULT));
             localStorage.setItem('nwl_version', NWL_VERSION);
