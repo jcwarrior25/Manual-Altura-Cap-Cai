@@ -70,6 +70,28 @@
     .campus-stat { display:flex; justify-content:space-between; padding:4px 0; font-size:.8rem; border-bottom:1px solid #faf6f0; }
     .campus-stat:last-child { border-bottom:none; }
 
+    .tabs { display:flex; gap:0; border-bottom:2px solid #f0e8d0; margin-bottom:16px; overflow-x:auto; }
+    .tab { padding:10px 18px; cursor:pointer; font-size:.8rem; font-weight:600; color:#888; border-bottom:3px solid transparent; white-space:nowrap; transition:all .2s; user-select:none; }
+    .tab:hover { color:var(--color-primario); background:#faf6f0; }
+    .tab.active { color:var(--color-primario); border-bottom-color:var(--color-oro); }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    .grade-bar { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid #f8f4ee; }
+    .grade-bar:last-child { border-bottom:none; }
+    .grade-label { width:160px; font-size:.8rem; flex-shrink:0; }
+    .grade-fill-wrap { flex:1; height:22px; background:#f5f0e6; border-radius:6px; overflow:hidden; position:relative; }
+    .grade-fill { height:100%; border-radius:6px; transition:width .4s ease; }
+    .grade-fill.maternal { background:#e8b4bc; }
+    .grade-fill.kinder { background:#d4af37; }
+    .grade-fill.primaria { background:#701321; }
+    .grade-fill.secundaria { background:#8e1a2a; }
+    .grade-fill.preparatoria { background:#4d0d17; }
+    .grade-fill.sindata { background:#ccc; }
+    .grade-count { width:40px; text-align:right; font-size:.82rem; font-weight:700; color:var(--color-primario); flex-shrink:0; }
+    .nivel-summary { display:flex; gap:12px; flex-wrap:wrap; margin-top:12px; }
+    .nivel-chip { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; background:var(--color-oro-suave); font-size:.78rem; font-weight:600; }
+    .nivel-dot { width:10px; height:10px; border-radius:50%; }
+
     .cap-section { border:1px solid #f0e8d0; border-radius:14px; padding:20px; margin-bottom:16px; }
     .cap-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
     .cap-header h3 { font-size:.95rem; color:var(--color-primario); }
@@ -139,6 +161,16 @@
     </div>
   </div>
 
+  <!-- Inscritos por Grado -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Inscritos por Grado</h2></div>
+    <div class="card-body">
+      <div class="tabs" id="gradoTabs"></div>
+      <div id="gradoTabContents"></div>
+      <div class="nivel-summary" id="nivelSummary"></div>
+    </div>
+  </div>
+
   <!-- Campus -->
   <div class="card fade-in d4">
     <div class="card-head"><h2>Reportes por Campus</h2></div>
@@ -182,7 +214,12 @@
 // ══════════════════════════════════════════════════════════════════════
 // REPORT_DATA — This is what Ops fills. Everything below renders from it.
 // ══════════════════════════════════════════════════════════════════════
-const D = {"weekLabel":"Colegio Newland (NWL) — Semana W15","weekRange":"Abr 6–12, 2026","extractedAt":"2026-04-13 09:00 CST","summary":"<strong>Post-Semana Santa y el pipeline despertó.</strong> 59 leads nuevos (+97% vs W14) y 17 visitas realizadas (de 2). <strong>6 inscripciones reales:</strong> Alberto 4 (SMA) + Elsa 2 (Zibatá). ⚠️ El CRM muestra 38 \"won\" pero 32 son importaciones CRM Legacy — NO son inscripciones reales. <strong>Alberto tuvo su mejor semana: 4 inscripciones incluyendo hermanos Fentón.</strong> Delia perdió 7 leads (44% de todas las pérdidas) y cerró 0. Juriquilla: 3 semanas sin inscripciones. 118 movimientos de etapa — el pipeline se movió de verdad.","kpis":[{"label":"Leads nuevos","value":59,"delta":29},{"label":"Inscripciones reales","value":6,"delta":2},{"label":"Visitas realizadas","value":17,"delta":15},{"label":"Perdidos","value":16,"delta":13},{"label":"Pipeline activo","value":512,"delta":23}],"leadsByDay":{"labels":["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"],"values":[14,7,17,8,8,3,2]},"sources":[{"name":"WhatsApp","count":23},{"name":"Formulario Web","count":19},{"name":"Facebook","count":4},{"name":"Sin fuente","count":4},{"name":"Captura Manual","count":3},{"name":"Lead orgánico","count":2},{"name":"Recomendación","count":2},{"name":"Paid Search","count":1},{"name":"Visita al campus","count":1}],"pipeline":[{"stage":"Nuevo Lead","total":84,"open":8},{"stage":"Calificado","total":393,"open":288},{"stage":"Cita Agendada","total":27,"open":22},{"stage":"Cita Realizada","total":150,"open":106},{"stage":"Ref Pago Enviada","total":1,"open":1},{"stage":"Dividir Alumnos","total":3,"open":3},{"stage":"Pago Confirmado","total":4,"open":3},{"stage":"Evaluación Agendada","total":14,"open":12},{"stage":"Evaluación Realizada","total":35,"open":34},{"stage":"Resultado Entregado","total":17,"open":17},{"stage":"Inscripción En Proceso","total":16,"open":16},{"stage":"Inscrito","total":81,"open":2}],"pipelineStatus":"<strong>Abiertos:</strong> 512 (62.1%) · <strong>Ganados:</strong> 80 (9.7%) · <strong>Perdidos:</strong> 144 (17.5%) · <strong>Abandonados:</strong> 89 (10.8%)","campuses":[{"name":"Zibatá","stats":[{"label":"Leads nuevos","value":24},{"label":"Inscripciones reales","value":2},{"label":"Visitas realizadas","value":6},{"label":"Pipeline activo","value":196}],"notes":"112 en Calificado. 32 CRM Legacy imports (NO contar como won). Elsa sola con 199 opps."},{"name":"Juriquilla","stats":[{"label":"Leads nuevos","value":13},{"label":"Inscripciones","value":0},{"label":"Visitas realizadas","value":7},{"label":"Pipeline activo","value":110}],"notes":"🔴 3 semanas sin inscripciones. Daniela 1.9% win vs Ana Isabel 13.8%. 5 pérdidas."},{"name":"Corregidora","stats":[{"label":"Leads nuevos","value":6},{"label":"Inscripciones","value":0},{"label":"Visitas realizadas","value":0},{"label":"Pipeline activo","value":101}],"notes":"0 visitas y 0 inscripciones tras 3-win streak en W14. 10 en Inscripción En Proceso."},{"name":"Milenio","stats":[{"label":"Leads nuevos","value":8},{"label":"Inscripciones","value":0},{"label":"Visitas realizadas","value":3},{"label":"Pipeline activo","value":51}],"notes":"🔴 Delia perdió 7 leads (44% de pérdidas). Pipeline bajó de 58 a 51."},{"name":"San Miguel de Allende","stats":[{"label":"Leads nuevos","value":5},{"label":"Inscripciones","value":4},{"label":"Visitas realizadas","value":1},{"label":"Pipeline activo","value":46}],"notes":"🎉 Alberto cerró 4 — mejor semana del ciclo. Win% 15.0%, Loss% 5.0%."}],"caps":[{"name":"Elsa Medina","campus":"Zibatá","active":199,"won":11,"winPct":15.6,"lossPct":6.2},{"name":"Daniela Alamilla","campus":"Juriquilla","active":57,"won":2,"winPct":1.9,"lossPct":37.9},{"name":"Ana Isabel Cervantes","campus":"Juriquilla","active":52,"won":16,"winPct":13.8,"lossPct":23.3},{"name":"Delia Rodriguez","campus":"Milenio","active":50,"won":7,"winPct":6.7,"lossPct":42.3},{"name":"Alberto Rodriguez","campus":"SMA","active":46,"won":9,"winPct":15,"lossPct":5},{"name":"Elizabeth Barrios","campus":"Corregidora","active":101,"won":3,"winPct":2.2,"lossPct":8.8}],"alerts":[{"level":"red","text":"32 importaciones CRM Legacy inflan los \"ganados\" a 38. Inscripciones reales: 6."},{"level":"red","text":"288 en Calificado (56.3% del pipeline abierto) — sigue creciendo neto +3 vs W14."},{"level":"red","text":"Delia: 7 pérdidas (42.3% loss% total) y 0 inscripciones — peor semana de cualquier CAP."},{"level":"yellow","text":"Juriquilla: 3 semanas sin inscripciones pese a 13 leads y 7 visitas."},{"level":"green","text":"Alberto: 4 inscripciones en SMA — mejor semana del ciclo. Win% 15.0%."},{"level":"green","text":"118 movimientos de etapa — pipeline activo post-Semana Santa."}],"priorities":["Delia: investigar las 7 pérdidas. Reunión lunes — ¿son leads fríos limpiados o pérdidas reales?","Juriquilla: cerrar al menos 2 de los 12 en Inscripción En Proceso + Resultado Entregado","Corregidora: concretar los 10 en Inscripción En Proceso — llamar cada uno","288 en Calificado: cada CAP debe clasificar por antigüedad y limpiar >30 días sin respuesta","Alberto: mantener momentum — cerrar 2 de los 4 en Resultado Entregado"],"dataQuality":[{"label":"Leads con fuente identificable","value":"93.2%","status":"good"},{"label":"Leads con campus asignado","value":"~100%","status":"good"},{"label":"Leads con nivel académico","value":"83.1%","status":"warn"},{"label":"Registros basura","value":"0","status":"good"},{"label":"CRM Legacy imports (excluir de won)","value":"32","status":"bad"}],"capSections":[]};
+const D = {"weekLabel":"Colegio Newland (NWL) — Semana W15","weekRange":"Abr 6–12, 2026","extractedAt":"2026-04-13 09:00 CST","summary":"<strong>Post-Semana Santa y el pipeline despertó.</strong> 59 leads nuevos (+97% vs W14) y 17 visitas realizadas (de 2). <strong>6 inscripciones reales:</strong> Alberto 4 (SMA) + Elsa 2 (Zibatá). ⚠️ El CRM muestra 38 \"won\" pero 32 son importaciones CRM Legacy — NO son inscripciones reales. <strong>Alberto tuvo su mejor semana: 4 inscripciones incluyendo hermanos Fentón.</strong> Delia perdió 7 leads (44% de todas las pérdidas) y cerró 0. Juriquilla: 3 semanas sin inscripciones. 118 movimientos de etapa — el pipeline se movió de verdad.","kpis":[{"label":"Leads nuevos","value":59,"delta":29},{"label":"Inscripciones reales","value":6,"delta":2},{"label":"Visitas realizadas","value":17,"delta":15},{"label":"Perdidos","value":16,"delta":13},{"label":"Pipeline activo","value":512,"delta":23}],"leadsByDay":{"labels":["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"],"values":[14,7,17,8,8,3,2]},"sources":[{"name":"WhatsApp","count":23},{"name":"Formulario Web","count":19},{"name":"Facebook","count":4},{"name":"Sin fuente","count":4},{"name":"Captura Manual","count":3},{"name":"Lead orgánico","count":2},{"name":"Recomendación","count":2},{"name":"Paid Search","count":1},{"name":"Visita al campus","count":1}],"pipeline":[{"stage":"Nuevo Lead","total":84,"open":8},{"stage":"Calificado","total":393,"open":288},{"stage":"Cita Agendada","total":27,"open":22},{"stage":"Cita Realizada","total":150,"open":106},{"stage":"Ref Pago Enviada","total":1,"open":1},{"stage":"Dividir Alumnos","total":3,"open":3},{"stage":"Pago Confirmado","total":4,"open":3},{"stage":"Evaluación Agendada","total":14,"open":12},{"stage":"Evaluación Realizada","total":35,"open":34},{"stage":"Resultado Entregado","total":17,"open":17},{"stage":"Inscripción En Proceso","total":16,"open":16},{"stage":"Inscrito","total":81,"open":2}],"pipelineStatus":"<strong>Abiertos:</strong> 512 (62.1%) · <strong>Ganados:</strong> 80 (9.7%) · <strong>Perdidos:</strong> 144 (17.5%) · <strong>Abandonados:</strong> 89 (10.8%)","campuses":[{"name":"Zibatá","stats":[{"label":"Leads nuevos","value":24},{"label":"Inscripciones reales","value":2},{"label":"Visitas realizadas","value":6},{"label":"Pipeline activo","value":196}],"notes":"112 en Calificado. 32 CRM Legacy imports (NO contar como won). Elsa sola con 199 opps."},{"name":"Juriquilla","stats":[{"label":"Leads nuevos","value":13},{"label":"Inscripciones","value":0},{"label":"Visitas realizadas","value":7},{"label":"Pipeline activo","value":110}],"notes":"🔴 3 semanas sin inscripciones. Daniela 1.9% win vs Ana Isabel 13.8%. 5 pérdidas."},{"name":"Corregidora","stats":[{"label":"Leads nuevos","value":6},{"label":"Inscripciones","value":0},{"label":"Visitas realizadas","value":0},{"label":"Pipeline activo","value":101}],"notes":"0 visitas y 0 inscripciones tras 3-win streak en W14. 10 en Inscripción En Proceso."},{"name":"Milenio","stats":[{"label":"Leads nuevos","value":8},{"label":"Inscripciones","value":0},{"label":"Visitas realizadas","value":3},{"label":"Pipeline activo","value":51}],"notes":"🔴 Delia perdió 7 leads (44% de pérdidas). Pipeline bajó de 58 a 51."},{"name":"San Miguel de Allende","stats":[{"label":"Leads nuevos","value":5},{"label":"Inscripciones","value":4},{"label":"Visitas realizadas","value":1},{"label":"Pipeline activo","value":46}],"notes":"🎉 Alberto cerró 4 — mejor semana del ciclo. Win% 15.0%, Loss% 5.0%."}],"caps":[{"name":"Elsa Medina","campus":"Zibatá","active":199,"won":11,"winPct":15.6,"lossPct":6.2},{"name":"Daniela Alamilla","campus":"Juriquilla","active":57,"won":2,"winPct":1.9,"lossPct":37.9},{"name":"Ana Isabel Cervantes","campus":"Juriquilla","active":52,"won":16,"winPct":13.8,"lossPct":23.3},{"name":"Delia Rodriguez","campus":"Milenio","active":50,"won":7,"winPct":6.7,"lossPct":42.3},{"name":"Alberto Rodriguez","campus":"SMA","active":46,"won":9,"winPct":15,"lossPct":5},{"name":"Elizabeth Barrios","campus":"Corregidora","active":101,"won":3,"winPct":2.2,"lossPct":8.8}],"alerts":[{"level":"red","text":"32 importaciones CRM Legacy inflan los \"ganados\" a 38. Inscripciones reales: 6."},{"level":"red","text":"288 en Calificado (56.3% del pipeline abierto) — sigue creciendo neto +3 vs W14."},{"level":"red","text":"Delia: 7 pérdidas (42.3% loss% total) y 0 inscripciones — peor semana de cualquier CAP."},{"level":"yellow","text":"Juriquilla: 3 semanas sin inscripciones pese a 13 leads y 7 visitas."},{"level":"green","text":"Alberto: 4 inscripciones en SMA — mejor semana del ciclo. Win% 15.0%."},{"level":"green","text":"118 movimientos de etapa — pipeline activo post-Semana Santa."}],"priorities":["Delia: investigar las 7 pérdidas. Reunión lunes — ¿son leads fríos limpiados o pérdidas reales?","Juriquilla: cerrar al menos 2 de los 12 en Inscripción En Proceso + Resultado Entregado","Corregidora: concretar los 10 en Inscripción En Proceso — llamar cada uno","288 en Calificado: cada CAP debe clasificar por antigüedad y limpiar >30 días sin respuesta","Alberto: mantener momentum — cerrar 2 de los 4 en Resultado Entregado"],"dataQuality":[{"label":"Leads con fuente identificable","value":"93.2%","status":"good"},{"label":"Leads con campus asignado","value":"~100%","status":"good"},{"label":"Leads con nivel académico","value":"83.1%","status":"warn"},{"label":"Registros basura","value":"0","status":"good"},{"label":"CRM Legacy imports (excluir de won)","value":"32","status":"bad"}],"inscritosPorGrado":{"campuses":["Corregidora","Juriquilla","Milenio","San Miguel de Allende","Zibatá"],"all":[{"grado":"Maternal","count":6},{"grado":"Kinder 1","count":22},{"grado":"Kinder 2","count":17},{"grado":"Kinder 3","count":4},{"grado":"Primaria 1","count":6},{"grado":"Primaria 2","count":8},{"grado":"Primaria 3","count":1},{"grado":"Primaria 4","count":4},{"grado":"Primaria 5","count":5},{"grado":"Primaria 6","count":6},{"grado":"Secundaria 1 (7mo)","count":25},{"grado":"Secundaria 2 (8vo)","count":4},{"grado":"Preparatoria 1 (10mo)","count":7},{"grado":"Sin dato","count":15}],"byCampus":{"Corregidora":[{"grado":"Kinder 1","count":1},{"grado":"Kinder 2","count":1},{"grado":"Preparatoria 1 (10mo)","count":1},{"grado":"Sin dato","count":1}],"Juriquilla":[{"grado":"Maternal","count":3},{"grado":"Kinder 1","count":6},{"grado":"Kinder 2","count":5},{"grado":"Primaria 1","count":1},{"grado":"Primaria 2","count":5},{"grado":"Primaria 3","count":1},{"grado":"Primaria 4","count":3},{"grado":"Primaria 5","count":3},{"grado":"Primaria 6","count":3},{"grado":"Secundaria 1 (7mo)","count":13},{"grado":"Secundaria 2 (8vo)","count":1},{"grado":"Sin dato","count":13}],"Milenio":[{"grado":"Kinder 1","count":2},{"grado":"Kinder 2","count":2},{"grado":"Primaria 2","count":1},{"grado":"Primaria 4","count":1},{"grado":"Primaria 6","count":2},{"grado":"Secundaria 1 (7mo)","count":3},{"grado":"Secundaria 2 (8vo)","count":1},{"grado":"Sin dato","count":1}],"San Miguel de Allende":[{"grado":"Maternal","count":2},{"grado":"Kinder 1","count":2},{"grado":"Primaria 1","count":1},{"grado":"Primaria 2","count":2},{"grado":"Primaria 6","count":1},{"grado":"Secundaria 2 (8vo)","count":1}],"Zibatá":[{"grado":"Maternal","count":1},{"grado":"Kinder 1","count":11},{"grado":"Kinder 2","count":9},{"grado":"Kinder 3","count":4},{"grado":"Primaria 1","count":4},{"grado":"Primaria 5","count":2},{"grado":"Secundaria 1 (7mo)","count":9},{"grado":"Secundaria 2 (8vo)","count":1},{"grado":"Preparatoria 1 (10mo)","count":6}]}},"capSections":[]};
+
+function switchGradoTab(tabId) {
+  document.querySelectorAll('#gradoTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+  document.querySelectorAll('#gradoTabContents .tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
+}
 
 if (!D) { document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#999;">No report data loaded.</div>'; }
 else { render(D); }
@@ -241,6 +278,66 @@ function render(d) {
     const totalOpen = d.pipeline.reduce((s,p) => s + (p.open||0), 0) || 1;
     d.pipeline.forEach(p => { tbody.innerHTML += `<tr><td>${v(p.stage)}</td><td class="text-right">${v(p.total, 0)}</td><td class="text-right">${v(p.open, 0)}</td><td class="text-right">${Math.round((p.open||0)/totalOpen*100)}%</td></tr>`; });
     if (d.pipelineStatus) document.getElementById('pipelineStatus').innerHTML = d.pipelineStatus;
+  }
+
+  // Inscritos por Grado
+  if (d.inscritosPorGrado) {
+    const gd = d.inscritosPorGrado;
+    const campusNames = ['Todos', ...(gd.campuses || [])];
+    const tabsEl = document.getElementById('gradoTabs');
+    const contentsEl = document.getElementById('gradoTabContents');
+
+    const nivelColors = { Maternal:'maternal', Kinder:'kinder', Primaria:'primaria', Secundaria:'secundaria', Preparatoria:'preparatoria', 'Sin dato':'sindata' };
+    const nivelDots = { Maternal:'#e8b4bc', Kinder:'#d4af37', Primaria:'#701321', Secundaria:'#8e1a2a', Preparatoria:'#4d0d17', 'Sin dato':'#ccc' };
+
+    function getNivel(grado) {
+      if (!grado || grado === 'Sin dato') return 'Sin dato';
+      if (grado.startsWith('Maternal')) return 'Maternal';
+      if (grado.startsWith('Kinder')) return 'Kinder';
+      if (grado.startsWith('Primaria')) return 'Primaria';
+      if (grado.startsWith('Secundaria')) return 'Secundaria';
+      if (grado.startsWith('Preparatoria')) return 'Preparatoria';
+      return 'Sin dato';
+    }
+
+    campusNames.forEach((campus, idx) => {
+      const tabId = 'gradoTab_' + idx;
+      tabsEl.innerHTML += `<div class="tab ${idx===0?'active':''}" data-tab="${tabId}" onclick="switchGradoTab('${tabId}')">${campus}</div>`;
+
+      const grades = campus === 'Todos' ? (gd.all || []) : (gd.byCampus?.[campus] || []);
+      const maxCount = Math.max(1, ...grades.map(g => g.count || 0));
+      const total = grades.reduce((s, g) => s + (g.count || 0), 0);
+
+      let html = `<div class="tab-content ${idx===0?'active':''}" id="${tabId}">`;
+      if (total === 0) {
+        html += '<p style="color:#aaa;font-size:.85rem;padding:12px 0;">Sin inscritos registrados con grado asignado.</p>';
+      } else {
+        grades.forEach(g => {
+          const nivel = getNivel(g.grado);
+          const pct = Math.round((g.count||0)/maxCount*100);
+          html += `<div class="grade-bar">
+            <div class="grade-label">${v(g.grado, 'Sin dato')}</div>
+            <div class="grade-fill-wrap"><div class="grade-fill ${nivelColors[nivel]||'sindata'}" style="width:${pct}%"></div></div>
+            <div class="grade-count">${g.count||0}</div>
+          </div>`;
+        });
+        html += `<div style="text-align:right;font-size:.78rem;color:#888;margin-top:6px;">Total: <strong>${total}</strong> inscritos</div>`;
+      }
+      html += '</div>';
+      contentsEl.innerHTML += html;
+    });
+
+    // Nivel summary chips (from "Todos")
+    const allGrades = gd.all || [];
+    const nivelTotals = {};
+    allGrades.forEach(g => {
+      const nivel = getNivel(g.grado);
+      nivelTotals[nivel] = (nivelTotals[nivel] || 0) + (g.count || 0);
+    });
+    const summaryEl = document.getElementById('nivelSummary');
+    Object.entries(nivelTotals).sort((a,b) => b[1]-a[1]).forEach(([nivel, count]) => {
+      summaryEl.innerHTML += `<div class="nivel-chip"><div class="nivel-dot" style="background:${nivelDots[nivel]||'#ccc'}"></div>${nivel}: <strong>${count}</strong></div>`;
+    });
   }
 
   // Campus
