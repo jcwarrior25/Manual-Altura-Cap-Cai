@@ -80,6 +80,33 @@
     .conv-review blockquote { border-left:3px solid var(--color-oro); padding:8px 12px; margin:8px 0; font-style:italic; font-size:.82rem; color:#555; background:rgba(179,142,29,.05); border-radius:0 8px 8px 0; }
 
     .chart-container { height:220px; margin:12px 0; }
+
+    /* Tabs (used in Inscritos por Grado) */
+    .tabs { display:flex; gap:0; border-bottom:2px solid #f0e8d0; margin-bottom:16px; flex-wrap:wrap; }
+    .tab { padding:10px 18px; cursor:pointer; font-size:.82rem; font-weight:600; color:#888; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; }
+    .tab:hover { color:var(--color-primario); }
+    .tab.active { color:var(--color-primario); border-bottom-color:var(--color-oro); }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+
+    /* Grade bars (color-coded per nivel) */
+    .grade-bar { display:flex; align-items:center; gap:8px; padding:6px 0; }
+    .grade-label { width:180px; font-size:.8rem; flex-shrink:0; color:#444; }
+    .grade-fill-wrap { flex:1; height:22px; background:#f5f0e6; border-radius:6px; overflow:hidden; }
+    .grade-fill { height:100%; border-radius:6px; transition:width .4s ease; }
+    .grade-fill.maternal { background:#e8b4bc; }
+    .grade-fill.kinder { background:#d4af37; }
+    .grade-fill.primaria { background:#701321; }
+    .grade-fill.secundaria { background:#8e1a2a; }
+    .grade-fill.preparatoria { background:#4d0d17; }
+    .grade-fill.sindata { background:#ccc; }
+    .grade-count { width:40px; text-align:right; font-size:.82rem; font-weight:600; color:#333; }
+
+    /* Nivel summary chips */
+    .nivel-summary { display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px dashed #f0e8d0; }
+    .nivel-chip { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; background:var(--color-oro-suave); font-size:.78rem; color:#555; }
+    .nivel-dot { width:10px; height:10px; border-radius:50%; }
+
     .footer { text-align:center; padding:32px 0 16px; font-size:.75rem; color:#aaa; }
     .back-link { display:inline-block; margin-bottom:20px; color:var(--color-primario); text-decoration:none; font-size:.85rem; font-weight:600; }
     .back-link:hover { text-decoration:underline; }
@@ -147,7 +174,10 @@
 
   <!-- Fastpass -->
   <div class="card fade-in d4" id="fastpassCard" style="display:none;">
-    <div class="card-head"><h2>🦘 Fastpass</h2></div>
+    <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <h2>🦘 Fastpass</h2>
+      <span class="badge badge-gold">Inscripción directa</span>
+    </div>
     <div class="card-body">
       <p style="font-size:.8rem;color:#666;margin-bottom:12px;">Oportunidades con Fastpass activo — inscripción directa sin pasar por evaluación CAI. Máximo 3 días para pagar, hasta 15 días con beneficio de temporada.</p>
       <div class="kpi-grid" id="fastpassKpis" style="margin-bottom:16px;"></div>
@@ -163,13 +193,10 @@
   <div class="card fade-in d4" id="inscritosPorGradoCard" style="display:none;">
     <div class="card-head"><h2>🎓 Inscritos por Grado</h2></div>
     <div class="card-body">
-      <p style="font-size:.8rem;color:#666;margin-bottom:12px;">Desglose de oportunidades ganadas (inscritos) por grado académico y campus.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-        <div><div class="chart-container" style="height:280px;"><canvas id="gradoChart"></canvas></div></div>
-        <div><table id="gradoTable"><thead><tr><th>Grado</th><th class="text-right">Inscritos</th><th class="text-right">%</th></tr></thead><tbody></tbody></table></div>
-      </div>
-      <h3 style="font-size:.9rem;color:var(--color-primario);margin:20px 0 10px;">Por Campus</h3>
-      <div id="gradoByCampus"></div>
+      <p style="font-size:.8rem;color:#666;margin-bottom:12px;">Desglose de oportunidades ganadas (inscritos) por grado académico y campus. Selecciona un campus para filtrar.</p>
+      <div class="tabs" id="gradoTabs"></div>
+      <div id="gradoTabContents"></div>
+      <div class="nivel-summary" id="nivelSummary"></div>
     </div>
   </div>
 
@@ -211,6 +238,11 @@
 // REPORT_DATA — This is what Ops fills. Everything below renders from it.
 // ══════════════════════════════════════════════════════════════════════
 const D = {"weekLabel":"Colegio Newland (NWL) — Semana W16 — Delia Rodriguez","weekRange":"Abr 14–20, 2026","extractedAt":"2026-04-20 20:58 CST","summary":"Reporte individual de Delia Rodriguez — Milenio","kpis":[],"capSections":[{"name":"Delia Rodriguez","campus":"Milenio","weeklyMetrics":[{"label":"Oportunidades activas","prev":"50","current":"43","delta":"-7"},{"label":"Leads nuevos","prev":"8","current":"13","delta":"+5"},{"label":"Visitas realizadas","prev":"3","current":"1","delta":"-2"},{"label":"Inscripciones reales","prev":"0","current":"1","delta":"+1"},{"label":"Leads perdidos","prev":"7","current":"9","delta":"+2"},{"label":"Calificado sin agendar","prev":"29","current":"23","delta":"-6"}],"conversations":[{"leadName":"Noemí Meléndez | Calificado","stage":"🔵 Calificado","messageCount":17,"outbound":13,"inbound":3,"context":"Lead del 1/abr por WhatsApp. NORA recopiló datos y envió brochure. Delia hizo follow-up personal el 3/abr con brochure de Maternal/Kinder y el 7/abr preguntando si revisó info e invitando a visita. Lead no respondió al follow-up personal.","highlight":"Delia: 'Buen día Maytte, checaste la info que te mandé? qué dudas surgieron? me encantaría invitarlos a conocer el colegio, les gustaría?' — tono amigable, invitación a visita. Buen follow-up a los 4 días."},{"leadName":"Gabriela U | Calificado","stage":"🔵 Calificado","messageCount":20,"outbound":13,"inbound":7,"context":"Lead del 17/abr. Gabriela preguntó por preescolar con detalle (disponibilidad, horarios, costos, becas). NORA respondió con info de Kinder. Solo 1 mensaje personal de Delia. Gabriela volvió con preguntas específicas (inscripción, uniforme, convenios) — NORA respondió otra vez.","highlight":"Solo 1 mensaje personal de Delia en un lead que hizo preguntas detalladas y específicas. NORA maneja la info, pero una familia que pregunta por becas, horarios extendidos y convenios empresariales es un lead caliente que necesita contacto personal urgente."}],"strengths":["1 inscripción real (Jose Gabriel Hernández) — rompió racha de 0.","Noemí: follow-up personal con brochure relevante y tono amigable.","13 leads nuevos (+5 vs W15) — flujo de entrada mejoró."],"improvements":["🔴 9 pérdidas — peor de todos los CAPs esta semana. 31.9% loss% total.","Gabriela U: lead caliente con preguntas detalladas y solo 1 mensaje personal. NORA no reemplaza el toque humano en leads que preguntan por becas y convenios.","Pipeline bajó a 43 activas (-7 vs W15) — está perdiendo más de lo que gana."],"focus":"Gabriela U: llamar el lunes — familia preguntando por becas, horarios extendidos, convenios empresariales. Es un lead caliente que NORA no puede cerrar. Investigar las 9 pérdidas: ¿limpiezas o leads reales que se fueron?"}]};
+
+function switchGradoTab(tabId) {
+  document.querySelectorAll('#gradoTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+  document.querySelectorAll('#gradoTabContents .tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
+}
 
 if (!D) { document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#999;">No report data loaded.</div>'; }
 else { render(D); }
@@ -304,51 +336,96 @@ function render(d) {
     d.priorities.forEach(p => { ol.innerHTML += `<li><strong>${p}</strong></li>`; });
   }
 
-  // Fastpass
+  // Fastpass (styled with color-coded KPIs)
   if (d.fastpass && (d.fastpass.total || d.fastpass.byCampus)) {
     document.getElementById('fastpassCard').style.display = '';
-    const kpiEl = document.getElementById('fastpassKpis');
     const fp = d.fastpass;
-    [
-      { lbl: 'Abiertos', val: fp.open },
-      { lbl: 'Inscritos', val: fp.won },
-      { lbl: 'Perdidos', val: fp.lost },
-      { lbl: 'Total', val: fp.total },
-    ].forEach(k => { kpiEl.innerHTML += `<div class="kpi"><div class="num">${v(k.val, 0)}</div><div class="lbl">${k.lbl}</div></div>`; });
-    const tbody = document.querySelector('#fastpassTable tbody');
+    const fpKpis = document.getElementById('fastpassKpis');
+    fpKpis.innerHTML = `
+      <div class="kpi"><div class="num">${v(fp.open, 0)}</div><div class="lbl">Abiertos</div></div>
+      <div class="kpi" style="background:#e8f5e9;"><div class="num" style="color:#2e7d32;">${v(fp.won, 0)}</div><div class="lbl">Inscritos</div></div>
+      <div class="kpi"><div class="num">${v(fp.lost, 0)}</div><div class="lbl">Perdidos</div></div>
+      <div class="kpi" style="background:var(--color-primario);"><div class="num" style="color:#fff;">${v(fp.total, 0)}</div><div class="lbl" style="color:#ffd;">Total Fastpass</div></div>
+    `;
+    const fpBody = document.querySelector('#fastpassTable tbody');
     (fp.byCampus || []).forEach(c => {
-      tbody.innerHTML += `<tr><td>${v(c.campus)}</td><td class="text-right">${v(c.open, 0)}</td><td class="text-right">${v(c.won, 0)}</td><td class="text-right">${v(c.lost, 0)}</td><td class="text-right"><strong>${v(c.total, 0)}</strong></td></tr>`;
+      fpBody.innerHTML += `<tr><td>${v(c.campus)}</td><td class="text-right">${v(c.open, 0)}</td><td class="text-right">${v(c.won, 0)}</td><td class="text-right">${v(c.lost, 0)}</td><td class="text-right"><strong>${v(c.total, 0)}</strong></td></tr>`;
     });
     if (fp.note) document.getElementById('fastpassNote').innerHTML = fp.note;
   }
 
-  // Inscritos por Grado
+  // Inscritos por Grado (tabs + color-coded horizontal bars + nivel summary)
   if (d.inscritosPorGrado && d.inscritosPorGrado.all && d.inscritosPorGrado.all.length) {
     document.getElementById('inscritosPorGradoCard').style.display = '';
-    const g = d.inscritosPorGrado;
-    const totalAll = g.all.reduce((s,x) => s + (x.count || 0), 0) || 1;
-    const tbody = document.querySelector('#gradoTable tbody');
-    g.all.forEach(row => {
-      tbody.innerHTML += `<tr><td>${v(row.grado)}</td><td class="text-right">${v(row.count, 0)}</td><td class="text-right">${Math.round((row.count||0)/totalAll*100)}%</td></tr>`;
-    });
-    tbody.innerHTML += `<tr style="background:var(--color-oro-suave);font-weight:700;"><td>Total</td><td class="text-right">${totalAll}</td><td class="text-right">100%</td></tr>`;
-    new Chart(document.getElementById('gradoChart'), {
-      type: 'bar',
-      data: { labels: g.all.map(x => v(x.grado)), datasets: [{ label: 'Inscritos', data: g.all.map(x => x.count || 0), backgroundColor: '#701321cc', borderRadius: 4 }] },
-      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
-    });
-    if (g.byCampus && typeof g.byCampus === 'object') {
-      const container = document.getElementById('gradoByCampus');
-      container.innerHTML = '<div class="campus-grid">' +
-        Object.entries(g.byCampus).map(([campus, rows]) => {
-          const total = (rows || []).reduce((s,x) => s + (x.count || 0), 0);
-          return `<div class="campus-card">
-            <h3>📍 ${v(campus)} <span style="font-size:.75rem;color:#888;font-weight:400;">(${total})</span></h3>
-            ${(rows || []).map(r => `<div class="campus-stat"><span>${v(r.grado)}</span><span><strong>${v(r.count, 0)}</strong></span></div>`).join('')}
-          </div>`;
-        }).join('') +
-      '</div>';
+    const gd = d.inscritosPorGrado;
+    const campusNames = ['Todos', ...(gd.campuses || [])];
+    const tabsEl = document.getElementById('gradoTabs');
+    const contentsEl = document.getElementById('gradoTabContents');
+
+    const nivelColors = { Maternal:'maternal', Kinder:'kinder', Primaria:'primaria', Secundaria:'secundaria', Preparatoria:'preparatoria', 'Sin dato':'sindata' };
+    const nivelDots = { Maternal:'#e8b4bc', Kinder:'#d4af37', Primaria:'#701321', Secundaria:'#8e1a2a', Preparatoria:'#4d0d17', 'Sin dato':'#ccc' };
+
+    // All grades in order Maternal → Prepa (always show all, even if 0)
+    const ALL_GRADES = [
+      'Maternal','Kinder 1','Kinder 2','Kinder 3',
+      'Primaria 1','Primaria 2','Primaria 3','Primaria 4','Primaria 5','Primaria 6',
+      'Secundaria 1 (7mo)','Secundaria 2 (8vo)','Secundaria 3 (9no)',
+      'Preparatoria 1 (10mo)','Preparatoria 2 (11vo)','Preparatoria 3 (12vo)',
+      'Sin grado asignado'
+    ];
+
+    function getNivel(grado) {
+      if (!grado || grado === 'Sin dato' || grado === 'Sin grado asignado') return 'Sin dato';
+      if (grado.startsWith('Maternal')) return 'Maternal';
+      if (grado.startsWith('Kinder')) return 'Kinder';
+      if (grado.startsWith('Primaria')) return 'Primaria';
+      if (grado.startsWith('Secundaria')) return 'Secundaria';
+      if (grado.startsWith('Preparatoria')) return 'Preparatoria';
+      return 'Sin dato';
     }
+
+    // Normalize grade data: merge into ALL_GRADES order, fill missing with 0
+    function normalizeGrades(gradeData) {
+      const map = {};
+      (gradeData || []).forEach(g => { map[g.grado] = (g.count || 0); });
+      return ALL_GRADES.map(g => ({ grado: g, count: map[g] || 0 }));
+    }
+
+    campusNames.forEach((campus, idx) => {
+      const tabId = 'gradoTab_' + idx;
+      tabsEl.innerHTML += `<div class="tab ${idx===0?'active':''}" data-tab="${tabId}" onclick="switchGradoTab('${tabId}')">${campus}</div>`;
+
+      const rawGrades = campus === 'Todos' ? (gd.all || []) : (gd.byCampus?.[campus] || []);
+      const grades = normalizeGrades(rawGrades);
+      const maxCount = Math.max(1, ...grades.map(g => g.count || 0));
+      const total = grades.reduce((s, g) => s + (g.count || 0), 0);
+
+      let html = `<div class="tab-content ${idx===0?'active':''}" id="${tabId}">`;
+      grades.forEach(g => {
+        const nivel = getNivel(g.grado);
+        const pct = Math.round((g.count||0)/maxCount*100);
+        html += `<div class="grade-bar">
+          <div class="grade-label">${v(g.grado, 'Sin dato')}</div>
+          <div class="grade-fill-wrap"><div class="grade-fill ${nivelColors[nivel]||'sindata'}" style="width:${pct}%"></div></div>
+          <div class="grade-count">${g.count||0}</div>
+        </div>`;
+      });
+      html += `<div style="text-align:right;font-size:.78rem;color:#888;margin-top:6px;">Total: <strong>${total}</strong> inscritos</div>`;
+      html += '</div>';
+      contentsEl.innerHTML += html;
+    });
+
+    // Nivel summary chips (from "Todos")
+    const allGrades = gd.all || [];
+    const nivelTotals = {};
+    allGrades.forEach(g => {
+      const nivel = getNivel(g.grado);
+      nivelTotals[nivel] = (nivelTotals[nivel] || 0) + (g.count || 0);
+    });
+    const summaryEl = document.getElementById('nivelSummary');
+    Object.entries(nivelTotals).sort((a,b) => b[1]-a[1]).forEach(([nivel, count]) => {
+      summaryEl.innerHTML += `<div class="nivel-chip"><div class="nivel-dot" style="background:${nivelDots[nivel]||'#ccc'}"></div>${nivel}: <strong>${count}</strong></div>`;
+    });
   }
 
   // Data quality
