@@ -167,7 +167,7 @@
     <div class="card-body">
       <p style="font-size:.82rem;color:#666;margin-bottom:12px;">Oportunidades con Fastpass Activo — inscripción directa sin evaluación CAI. Máx 3 días para pagar.</p>
       <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;" id="fastpassKpis"></div>
-      <table id="fastpassTable"><thead><tr><th>Campus</th><th class="text-right">Open</th><th class="text-right">Won</th><th class="text-right">Lost</th><th class="text-right">Total</th></tr></thead><tbody></tbody></table>
+      <table id="fastpassTable"><thead><tr><th>Campus</th><th class="text-right">Abiertos</th><th class="text-right">Inscritos</th><th class="text-right">Perdidos</th><th class="text-right">Total</th></tr></thead><tbody></tbody></table>
     </div>
   </div>
 
@@ -295,8 +295,8 @@ function render(d) {
     const fp = d.fastpass;
     const fpKpis = document.getElementById('fastpassKpis');
     fpKpis.innerHTML = `
-      <div class="kpi"><div class="num">${fp.open||0}</div><div class="lbl">Open</div></div>
-      <div class="kpi" style="background:#e8f5e9;"><div class="num" style="color:#2e7d32;">${fp.won||0}</div><div class="lbl">Inscritos (Won)</div></div>
+      <div class="kpi"><div class="num">${fp.open||0}</div><div class="lbl">Abiertos</div></div>
+      <div class="kpi" style="background:#e8f5e9;"><div class="num" style="color:#2e7d32;">${fp.won||0}</div><div class="lbl">Inscritos</div></div>
       <div class="kpi"><div class="num">${fp.lost||0}</div><div class="lbl">Perdidos</div></div>
       <div class="kpi" style="background:var(--color-primario);"><div class="num" style="color:#fff;">${fp.total||0}</div><div class="lbl" style="color:#ffd;">Total Fastpass</div></div>
     `;
@@ -316,8 +316,17 @@ function render(d) {
     const nivelColors = { Maternal:'maternal', Kinder:'kinder', Primaria:'primaria', Secundaria:'secundaria', Preparatoria:'preparatoria', 'Sin dato':'sindata' };
     const nivelDots = { Maternal:'#e8b4bc', Kinder:'#d4af37', Primaria:'#701321', Secundaria:'#8e1a2a', Preparatoria:'#4d0d17', 'Sin dato':'#ccc' };
 
+    // All grades in order Maternal → Prepa (always show all, even if 0)
+    const ALL_GRADES = [
+      'Maternal','Kinder 1','Kinder 2','Kinder 3',
+      'Primaria 1','Primaria 2','Primaria 3','Primaria 4','Primaria 5','Primaria 6',
+      'Secundaria 1 (7mo)','Secundaria 2 (8vo)','Secundaria 3 (9no)',
+      'Preparatoria 1 (10mo)','Preparatoria 2 (11vo)','Preparatoria 3 (12vo)',
+      'Sin grado asignado'
+    ];
+
     function getNivel(grado) {
-      if (!grado || grado === 'Sin dato') return 'Sin dato';
+      if (!grado || grado === 'Sin dato' || grado === 'Sin grado asignado') return 'Sin dato';
       if (grado.startsWith('Maternal')) return 'Maternal';
       if (grado.startsWith('Kinder')) return 'Kinder';
       if (grado.startsWith('Primaria')) return 'Primaria';
@@ -326,19 +335,24 @@ function render(d) {
       return 'Sin dato';
     }
 
+    // Normalize grade data: merge into ALL_GRADES order, fill missing with 0
+    function normalizeGrades(gradeData) {
+      const map = {};
+      (gradeData || []).forEach(g => { map[g.grado] = (g.count || 0); });
+      return ALL_GRADES.map(g => ({ grado: g, count: map[g] || 0 }));
+    }
+
     campusNames.forEach((campus, idx) => {
       const tabId = 'gradoTab_' + idx;
       tabsEl.innerHTML += `<div class="tab ${idx===0?'active':''}" data-tab="${tabId}" onclick="switchGradoTab('${tabId}')">${campus}</div>`;
 
-      const grades = campus === 'Todos' ? (gd.all || []) : (gd.byCampus?.[campus] || []);
+      const rawGrades = campus === 'Todos' ? (gd.all || []) : (gd.byCampus?.[campus] || []);
+      const grades = normalizeGrades(rawGrades);
       const maxCount = Math.max(1, ...grades.map(g => g.count || 0));
       const total = grades.reduce((s, g) => s + (g.count || 0), 0);
 
       let html = `<div class="tab-content ${idx===0?'active':''}" id="${tabId}">`;
-      if (total === 0) {
-        html += '<p style="color:#aaa;font-size:.85rem;padding:12px 0;">Sin inscritos registrados con grado asignado.</p>';
-      } else {
-        grades.forEach(g => {
+      grades.forEach(g => {
           const nivel = getNivel(g.grado);
           const pct = Math.round((g.count||0)/maxCount*100);
           html += `<div class="grade-bar">
@@ -348,7 +362,6 @@ function render(d) {
           </div>`;
         });
         html += `<div style="text-align:right;font-size:.78rem;color:#888;margin-top:6px;">Total: <strong>${total}</strong> inscritos</div>`;
-      }
       html += '</div>';
       contentsEl.innerHTML += html;
     });
