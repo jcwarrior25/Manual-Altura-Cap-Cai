@@ -170,9 +170,9 @@
                 role: "user",
                 reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-ana-isabel"]
             },
-            "delia.rodriguez": {
-                nombre: "Delia Rodriguez",
-                password: "delia2026",
+            "itzel.vargas": {
+                nombre: "Itzel Vargas",
+                password: "itzel2026",
                 role: "user",
                 reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-delia-rodriguez"]
             },
@@ -187,11 +187,41 @@
                 password: "elizabeth2026",
                 role: "user",
                 reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-elizabeth-barrios"]
+            },
+            "dir.juriquilla": {
+                nombre: "Dirección Juriquilla",
+                password: "juriquilla2026",
+                role: "user",
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+            },
+            "dir.zibata": {
+                nombre: "Dirección Zibata",
+                password: "zibata2026",
+                role: "user",
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+            },
+            "dir.milenio": {
+                nombre: "Dirección Milenio",
+                password: "milenio2026",
+                role: "user",
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+            },
+            "dir.corregidora": {
+                nombre: "Dirección Corregidora",
+                password: "corregidora2026",
+                role: "user",
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+            },
+            "dir.sanmiguel": {
+                nombre: "Dirección San Miguel",
+                password: "sanmiguel2026",
+                role: "user",
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
             }
         };
 
         // Re-seed si cambia la versión del sistema de permisos
-        const NWL_VERSION = "6";
+        const NWL_VERSION = "7";
         if (localStorage.getItem('nwl_version') !== NWL_VERSION) {
             localStorage.setItem('nwl_users', JSON.stringify(USUARIOS_DEFAULT));
             localStorage.setItem('nwl_version', NWL_VERSION);
