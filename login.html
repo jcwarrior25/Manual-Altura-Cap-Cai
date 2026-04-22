@@ -233,7 +233,7 @@
         };
 
         // Re-seed si cambia la versión del sistema de permisos
-        const NWL_VERSION = "9";
+        const NWL_VERSION = "10";
         if (localStorage.getItem('nwl_version') !== NWL_VERSION) {
             localStorage.setItem('nwl_users', JSON.stringify(USUARIOS_DEFAULT));
             localStorage.setItem('nwl_version', NWL_VERSION);
