@@ -188,46 +188,52 @@
                 role: "user",
                 reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-elizabeth-barrios"]
             },
+            "avryl.moreno": {
+                nombre: "Avryl Moreno",
+                password: "avryl2026",
+                role: "user",
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-avryl-moreno"]
+            },
             "dir.juriquilla": {
                 nombre: "Dirección Juriquilla",
                 password: "juriquilla2026",
                 role: "user",
-                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-daniela-alamilla", "cap-ana-isabel"]
             },
             "dir.zibata": {
                 nombre: "Dirección Zibata",
                 password: "zibata2026",
                 role: "user",
-                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-elsa-medina", "cap-avryl-moreno"]
             },
             "dir.milenio": {
                 nombre: "Dirección Milenio",
                 password: "milenio2026",
                 role: "user",
-                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-delia-rodriguez"]
             },
             "dir.corregidora": {
                 nombre: "Dirección Corregidora",
                 password: "corregidora2026",
                 role: "user",
-                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-elizabeth-barrios"]
             },
             "dir.sanmiguel": {
                 nombre: "Dirección San Miguel",
                 password: "sanmiguel2026",
                 role: "user",
-                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-alberto-rodriguez"]
             },
             "rectoria": {
                 nombre: "Rectoría NWL",
                 password: "rectoria2026",
                 role: "user",
-                reportes: ["semanales-marzo-2026", "semanales-abril-2026"]
+                reportes: ["semanales-marzo-2026", "semanales-abril-2026", "cap-elsa-medina", "cap-daniela-alamilla", "cap-ana-isabel", "cap-delia-rodriguez", "cap-alberto-rodriguez", "cap-elizabeth-barrios", "cap-avryl-moreno"]
             }
         };
 
         // Re-seed si cambia la versión del sistema de permisos
-        const NWL_VERSION = "8";
+        const NWL_VERSION = "9";
         if (localStorage.getItem('nwl_version') !== NWL_VERSION) {
             localStorage.setItem('nwl_users', JSON.stringify(USUARIOS_DEFAULT));
             localStorage.setItem('nwl_version', NWL_VERSION);
