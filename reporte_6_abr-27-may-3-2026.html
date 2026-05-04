@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte Semanal CRM — {{WEEK_LABEL}}</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --color-fondo: #f8f9fa;
+      --color-primario: #701321;
+      --color-primario-light: #8e1a2a;
+      --color-primario-dark: #4d0d17;
+      --color-oro: #b38e1d;
+      --color-oro-brillante: #d4af37;
+      --color-oro-suave: #F4E4C1;
+      --texto-oscuro: #2d0a0a;
+      --texto-claro: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: radial-gradient(circle at center, #fff 0%, #f0f0f0 100%); color: var(--texto-oscuro); min-height: 100vh; padding: 20px; }
+    .container { max-width: 960px; margin: 0 auto; }
+    .fade-in { opacity: 0; transform: translateY(16px); animation: fadeUp .5s ease-out forwards; }
+    @keyframes fadeUp { to { opacity:1; transform:none; } }
+    .d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}.d4{animation-delay:.4s}.d5{animation-delay:.5s}
+
+    .page-header { text-align:center; margin-bottom:32px; }
+    .page-header h1 { font-size:1.8rem; letter-spacing:3px; color:var(--color-primario); text-transform:uppercase; border-bottom:3px solid var(--color-oro); padding-bottom:10px; display:inline-block; }
+    .page-header .subtitle { font-size:.85rem; color:#888; margin-top:8px; }
+
+    .meta-bar { display:flex; gap:24px; flex-wrap:wrap; background:#fff; border-radius:12px; padding:16px 20px; margin-bottom:24px; box-shadow:0 2px 8px rgba(0,0,0,.06); font-size:.8rem; }
+    .meta-bar .label { font-weight:700; color:var(--color-primario); }
+
+    .card { background:#fff; border-radius:14px; box-shadow:0 4px 16px rgba(0,0,0,.06); margin-bottom:20px; overflow:hidden; }
+    .card-head { padding:18px 22px; border-bottom:1px solid #f0e8d0; }
+    .card-head h2 { font-size:1rem; font-weight:700; color:var(--color-primario); }
+    .card-head .badge { font-size:.7rem; padding:3px 10px; border-radius:20px; font-weight:600; }
+    .badge-red { background:var(--color-primario); color:#fff; }
+    .badge-gold { background:var(--color-oro-suave); color:var(--color-oro); }
+    .badge-green { background:#e8f5e9; color:#2e7d32; }
+    .card-body { padding:20px 22px; }
+
+    .summary-text { font-size:.9rem; line-height:1.7; margin-bottom:12px; }
+    .summary-text strong { color:var(--color-primario); }
+
+    .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:16px 0; }
+    .kpi { text-align:center; padding:16px 8px; border-radius:12px; background:var(--color-oro-suave); }
+    .kpi .num { font-size:1.6rem; font-weight:800; color:var(--color-primario); }
+    .kpi .lbl { font-size:.7rem; color:#666; margin-top:2px; }
+    .kpi .delta { font-size:.65rem; margin-top:4px; }
+    .delta-up { color:#2e7d32; }
+    .delta-down { color:var(--color-primario); }
+    .delta-neutral { color:#888; }
+
+    table { width:100%; border-collapse:collapse; font-size:.82rem; }
+    th { background:var(--color-primario); color:#fff; padding:10px 14px; text-align:left; font-weight:600; }
+    td { padding:9px 14px; border-bottom:1px solid #f0e8d0; }
+    tr:hover td { background:#faf6f0; }
+    .text-right { text-align:right; }
+    .text-center { text-align:center; }
+
+    .alert { padding:12px 16px; border-radius:10px; margin:8px 0; font-size:.82rem; }
+    .alert-red { background:#fce4e4; border-left:4px solid var(--color-primario); }
+    .alert-yellow { background:#fff8e1; border-left:4px solid var(--color-oro); }
+    .alert-green { background:#e8f5e9; border-left:4px solid #2e7d32; }
+
+    .campus-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+    .campus-card { border:1px solid #f0e8d0; border-radius:12px; padding:16px; }
+    .campus-card h3 { font-size:.9rem; color:var(--color-primario); margin-bottom:10px; }
+    .campus-stat { display:flex; justify-content:space-between; padding:4px 0; font-size:.8rem; border-bottom:1px solid #faf6f0; }
+    .campus-stat:last-child { border-bottom:none; }
+
+    .cap-section { border:1px solid #f0e8d0; border-radius:14px; padding:20px; margin-bottom:16px; }
+    .cap-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .cap-header h3 { font-size:.95rem; color:var(--color-primario); }
+    .cap-header .campus-tag { font-size:.7rem; padding:3px 10px; border-radius:20px; background:var(--color-oro-suave); color:var(--color-oro); font-weight:600; }
+    .conv-review { background:#faf8f4; border-radius:10px; padding:14px; margin:10px 0; }
+    .conv-review .conv-name { font-weight:700; font-size:.85rem; color:var(--color-primario); }
+    .conv-review .conv-meta { font-size:.75rem; color:#888; margin:4px 0 8px; }
+    .conv-review blockquote { border-left:3px solid var(--color-oro); padding:8px 12px; margin:8px 0; font-style:italic; font-size:.82rem; color:#555; background:rgba(179,142,29,.05); border-radius:0 8px 8px 0; }
+
+    .chart-container { height:220px; margin:12px 0; }
+    .footer { text-align:center; padding:32px 0 16px; font-size:.75rem; color:#aaa; }
+    .back-link { display:inline-block; margin-bottom:20px; color:var(--color-primario); text-decoration:none; font-size:.85rem; font-weight:600; }
+    .back-link:hover { text-decoration:underline; }
+
+    /* Tabs (Inscritos por Grado) */
+    .tabs { display:flex; gap:0; border-bottom:2px solid #f0e8d0; margin-bottom:16px; flex-wrap:wrap; }
+    .tab { padding:10px 18px; cursor:pointer; font-size:.82rem; font-weight:600; color:#888; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all .2s; }
+    .tab:hover { color:var(--color-primario); }
+    .tab.active { color:var(--color-primario); border-bottom-color:var(--color-oro); }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+
+    /* Grade bars */
+    .grade-bar { display:flex; align-items:center; gap:8px; padding:6px 0; }
+    .grade-label { width:180px; font-size:.8rem; flex-shrink:0; color:#444; }
+    .grade-fill-wrap { flex:1; height:22px; background:#f5f0e6; border-radius:6px; overflow:hidden; }
+    .grade-fill { height:100%; border-radius:6px; transition:width .4s ease; }
+    .grade-fill.maternal { background:#e8b4bc; }
+    .grade-fill.kinder { background:#d4af37; }
+    .grade-fill.primaria { background:#701321; }
+    .grade-fill.secundaria { background:#8e1a2a; }
+    .grade-fill.preparatoria { background:#4d0d17; }
+    .grade-fill.sindata { background:#ccc; }
+    .grade-count { width:40px; text-align:right; font-size:.82rem; font-weight:600; color:#333; }
+
+    /* Nivel summary chips */
+    .nivel-summary { display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px dashed #f0e8d0; }
+    .nivel-chip { display:flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; background:var(--color-oro-suave); font-size:.78rem; color:#555; }
+    .nivel-dot { width:10px; height:10px; border-radius:50%; }
+
+    /* Weekly × grade matrix (Evolución Semanal por Grado) */
+    .weekly-grade-table { font-size:.78rem; }
+    .weekly-grade-table th { font-size:.72rem; padding:8px 10px; }
+    .weekly-grade-table td { padding:6px 10px; text-align:center; transition:background .2s; }
+    .weekly-grade-table td.grade-name { text-align:left; font-weight:500; color:#444; background:#fafafa; }
+    .weekly-grade-table tr.row-total td { font-weight:700; background:var(--color-oro-suave); color:var(--texto-oscuro); border-top:2px solid var(--color-oro); }
+    .weekly-grade-table tr.row-total td.grade-name { background:var(--color-oro-suave); }
+    .legacy-chip { display:inline-block; font-size:.65rem; color:#888; font-weight:400; }
+    .dormant-section { margin-top:16px; padding-top:14px; border-top:1px dashed #f0e8d0; }
+    .dormant-section h4 { font-size:.82rem; color:var(--color-primario); margin-bottom:8px; }
+    .dormant-chips { display:flex; gap:8px; flex-wrap:wrap; }
+    .dormant-chip { padding:5px 12px; border-radius:16px; background:#fce4e4; border-left:3px solid var(--color-primario); font-size:.75rem; color:#555; }
+    .dormant-empty { font-size:.78rem; color:#888; font-style:italic; }
+
+    @media (max-width:700px) { .kpi-grid{grid-template-columns:repeat(2,1fr)} .campus-grid{grid-template-columns:1fr} }
+    @media print { body{padding:0;background:#fff} .card{box-shadow:none;break-inside:avoid} .back-link{display:none} }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="reportes.html" class="back-link">← Todos los reportes</a>
+
+  <header class="page-header fade-in">
+    <h1>Reporte Semanal CRM</h1>
+    <div class="subtitle" id="weekLabel"></div>
+  </header>
+
+  <div class="meta-bar fade-in d1">
+    <div><span class="label">Semana:</span> <span id="metaWeek"></span></div>
+    <div><span class="label">Extraído:</span> <span id="metaDate"></span></div>
+    <div><span class="label">Fuente:</span> GHL API (Admisiones NWL)</div>
+    <div><span class="label">Pipeline:</span> cPCXiO9ps2rbFPNvHWHG</div>
+  </div>
+
+  <!-- Summary -->
+  <div class="card fade-in d2">
+    <div class="card-head"><h2>Resumen de la Semana</h2></div>
+    <div class="card-body"><p class="summary-text" id="summary"></p></div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid fade-in d2" id="kpiGrid"></div>
+
+  <!-- Leads por día chart -->
+  <div class="card fade-in d3">
+    <div class="card-head"><h2>Volumen de Leads por Día</h2></div>
+    <div class="card-body"><div class="chart-container"><canvas id="leadsChart"></canvas></div></div>
+  </div>
+
+  <!-- Fuentes -->
+  <div class="card fade-in d3">
+    <div class="card-head"><h2>Fuentes de Leads</h2></div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div><div class="chart-container"><canvas id="sourcesChart"></canvas></div></div>
+        <div><table id="sourcesTable"><thead><tr><th>Fuente</th><th class="text-right">Cantidad</th><th class="text-right">%</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pipeline -->
+  <div class="card fade-in d3">
+    <div class="card-head"><h2>Pipeline — Distribución por Etapa</h2></div>
+    <div class="card-body">
+      <table id="pipelineTable"><thead><tr><th>Etapa</th><th class="text-right">Total</th><th class="text-right">Abiertos</th><th class="text-right">%</th></tr></thead><tbody></tbody></table>
+      <div id="pipelineStatus" style="margin-top:12px;font-size:.82rem;"></div>
+    </div>
+  </div>
+
+  <!-- Campus -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Reportes por Campus</h2></div>
+    <div class="card-body"><div class="campus-grid" id="campusGrid"></div></div>
+  </div>
+
+  <!-- Fastpass -->
+  <div class="card fade-in d4" id="fastpassCard" style="display:none;">
+    <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <h2>🦘 Fastpass</h2>
+      <span class="badge badge-gold">Inscripción directa</span>
+    </div>
+    <div class="card-body">
+      <p style="font-size:.8rem;color:#666;margin-bottom:12px;">Oportunidades con Fastpass activo — inscripción directa sin pasar por evaluación CAI. Máximo 3 días para pagar, hasta 15 días con beneficio de temporada.</p>
+      <div class="kpi-grid" id="fastpassKpis" style="margin-bottom:16px;"></div>
+      <table id="fastpassTable">
+        <thead><tr><th>Campus</th><th class="text-right">Abiertos</th><th class="text-right">Inscritos</th><th class="text-right">Perdidos</th><th class="text-right">Total</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p id="fastpassNote" style="margin-top:10px;font-size:.78rem;color:#666;"></p>
+    </div>
+  </div>
+
+  <!-- Evolución Semanal por Grado -->
+  <div class="card fade-in d4" id="weeklyByGradeCard" style="display:none;">
+    <div class="card-head"><h2>📅 Evolución Semanal por Grado</h2></div>
+    <div class="card-body">
+      <p style="font-size:.8rem;color:#666;margin-bottom:12px;">Cierres por grado en las últimas 4 semanas. Los lotes legacy se separan en paréntesis.</p>
+      <div class="tabs" id="weeklyGradeTabs"></div>
+      <div id="weeklyGradeTabContents"></div>
+      <div class="dormant-section" id="dormantSection"></div>
+    </div>
+  </div>
+
+  <!-- Acumulado del Ciclo -->
+  <div class="card fade-in d4" id="inscritosPorGradoCard" style="display:none;">
+    <div class="card-head"><h2 id="acumuladoCicloHeading">🎓 Acumulado del Ciclo</h2></div>
+    <div class="card-body">
+      <p style="font-size:.8rem;color:#666;margin-bottom:12px;">Total acumulado del ciclo 2026-2027, no semana actual. Selecciona un campus para filtrar.</p>
+      <div class="tabs" id="gradoTabs"></div>
+      <div id="gradoTabContents"></div>
+      <div class="nivel-summary" id="nivelSummary"></div>
+    </div>
+  </div>
+
+  <!-- CAP Performance -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Métricas por CAP</h2></div>
+    <div class="card-body"><table id="capTable"><thead><tr><th>CAP</th><th>Campus</th><th class="text-right">Activos</th><th class="text-right">Won</th><th class="text-right">Win%</th><th class="text-right">Loss%</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- Alerts -->
+  <div class="card fade-in d4">
+    <div class="card-head"><h2>Alertas y Banderas</h2></div>
+    <div class="card-body" id="alertsContainer"></div>
+  </div>
+
+  <!-- Priorities -->
+  <div class="card fade-in d5">
+    <div class="card-head"><h2>Prioridades Próxima Semana</h2></div>
+    <div class="card-body"><ol id="prioritiesList" style="padding-left:18px;font-size:.88rem;line-height:1.8;"></ol></div>
+  </div>
+
+  <!-- Data Quality -->
+  <div class="card fade-in d5">
+    <div class="card-head"><h2>Calidad de Datos</h2></div>
+    <div class="card-body"><table id="qualityTable"><thead><tr><th>Indicador</th><th class="text-right">Valor</th><th class="text-center">Estado</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- Individual CAP Sections -->
+  <div id="capSections"></div>
+
+  <div class="footer">
+    <p>Reporte generado por ALTURA Performance Marketing</p>
+    <p>Pipeline ID: cPCXiO9ps2rbFPNvHWHG</p>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// REPORT_DATA — This is what Ops fills. Everything below renders from it.
+// ══════════════════════════════════════════════════════════════════════
+const D = {"weekLabel":"Colegio Newland (NWL) — Semana W18","weekRange":"Abr 27 – May 3, 2026","extractedAt":"2026-05-04 17:00 CST","summary":"Semana de <strong>desaceleración orgánica fuerte</strong>: solo <strong>6 cierres orgánicos</strong> (vs 19 en W17) y <strong>0 migraciones legacy</strong>, lectura limpia del rendimiento real. <strong>Elizabeth (Corregidora) recuperó tracción con 4 cierres</strong> después de 0 en W17, mientras que <strong>Daniela, Itzel y Alberto cerraron 0</strong>. Alberto recibió <strong>19 leads nuevos</strong> en SMA — pico de captación, todavía sin convertir. El pipeline de Calificado bajó <strong>72 opps</strong> (261→189) — buen drenaje, pero las visitas cayeron a <strong>7</strong> (vs 10 en W17). El cuello sigue ahí: <strong>189 opps en Calificado sin agendar visita</strong>.","kpis":[{"label":"Leads nuevos","value":97,"delta":0},{"label":"Inscripciones","value":6,"delta":-13},{"label":"Visitas realizadas","value":7,"delta":-3},{"label":"Perdidos","value":10,"delta":-11},{"label":"Pipeline activo","value":386,"delta":null}],"leadsByDay":{"labels":["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"],"values":[32,24,15,15,4,2,5]},"sources":[{"name":"WhatsApp","count":53},{"name":"Formulario Pag Web","count":17},{"name":"Sin fuente","count":8},{"name":"Instagram","count":7},{"name":"Facebook","count":4},{"name":"Lead orgánico","count":3},{"name":"Captura Manual","count":2},{"name":"Organic Search","count":1},{"name":"Formulario para pag web","count":1},{"name":"Form web","count":1}],"pipeline":[{"stage":"Nuevo Lead","total":42,"open":2},{"stage":"Calificado","total":331,"open":189},{"stage":"Dividir Alumnos","total":5,"open":5},{"stage":"Cita Campus — Agendada","total":44,"open":33},{"stage":"Cita — Realizada","total":143,"open":99},{"stage":"Cita — No Asistió","total":0,"open":0},{"stage":"Evaluación / Perfil — Agendada","total":13,"open":9},{"stage":"Referencia de Pago Enviada","total":1,"open":1},{"stage":"Pago Perfil Confirmado","total":3,"open":3},{"stage":"Evaluación — Realizada","total":17,"open":14},{"stage":"Resultado Entregado","total":23,"open":20},{"stage":"Inscripción — En Proceso","total":12,"open":11},{"stage":"Inscrito (Lead Ganado)","total":132,"open":0}],"pipelineStatus":"<strong>Abiertos:</strong> 386 · <strong>Ganados:</strong> 135 · <strong>Perdidos:</strong> 97 · <strong>Abandonados:</strong> 148","campuses":[{"name":"Zibatá","stats":[{"label":"Leads nuevos","value":32},{"label":"Visitas realizadas","value":4},{"label":"Inscripciones nuevas (orgánicas)","value":1},{"label":"Migraciones legacy","value":0},{"label":"Pipeline activo","value":149}],"notes":"Solo 1 inscripción orgánica esta semana (vs 8 en W17). El pipeline activo bajó a 149. 75 leads en Calificado siguen siendo el cuello de botella."},{"name":"Juriquilla","stats":[{"label":"Leads nuevos","value":7},{"label":"Visitas realizadas","value":2},{"label":"Inscripciones nuevas (orgánicas)","value":1},{"label":"Migraciones legacy","value":0},{"label":"Pipeline activo","value":69}],"notes":"1 inscripción orgánica entre Daniela y Ana Isabel (Daniela: 0, Ana Isabel: 1). 7 leads nuevos. 23 en Calificado pendientes."},{"name":"Corregidora","stats":[{"label":"Leads nuevos","value":7},{"label":"Visitas realizadas","value":0},{"label":"Inscripciones nuevas (orgánicas)","value":4},{"label":"Migraciones legacy","value":0},{"label":"Pipeline activo","value":95}],"notes":"🟢 Mejor semana del campus: 4 inscripciones orgánicas de Elizabeth tras 0 en W17. Sin embargo, 50 leads siguen en Calificado y 0 visitas realizadas."},{"name":"Milenio","stats":[{"label":"Leads nuevos","value":7},{"label":"Visitas realizadas","value":1},{"label":"Inscripciones nuevas (orgánicas)","value":0},{"label":"Migraciones legacy","value":0},{"label":"Pipeline activo","value":39}],"notes":"Semana en pausa: 0 inscripciones, 7 leads nuevos, solo 1 visita. Itzel acumula 4 perdidos de los 4 perdidos del campus."},{"name":"San Miguel de Allende","stats":[{"label":"Leads nuevos","value":17},{"label":"Visitas realizadas","value":0},{"label":"Inscripciones nuevas (orgánicas)","value":0},{"label":"Migraciones legacy","value":0},{"label":"Pipeline activo","value":33}],"notes":"🟡 17 leads nuevos (mayor del ciclo) pero 0 inscripciones, 0 visitas. Alberto recibió 19 leads asignados — captación fuerte, pero todo en stage Calificado (19 abiertos)."}],"caps":[{"name":"Elsa Medina","campus":"Zibatá","active":144,"won":63,"wonOrganic":13,"wonLegacy":50,"winPct":22.8,"lossPct":5.4},{"name":"Daniela Alamilla","campus":"Juriquilla","active":38,"won":20,"wonOrganic":6,"wonLegacy":14,"winPct":21.3,"lossPct":17},{"name":"Ana Isabel Cervantes","campus":"Juriquilla","active":29,"won":30,"wonOrganic":13,"wonLegacy":17,"winPct":26.8,"lossPct":23.2},{"name":"Itzel Vargas","campus":"Milenio","active":38,"won":12,"wonOrganic":12,"wonLegacy":0,"winPct":12,"lossPct":30},{"name":"Alberto Rodriguez","campus":"San Miguel de Allende","active":38,"won":3,"wonOrganic":3,"wonLegacy":0,"winPct":6.7,"lossPct":4.4},{"name":"Elizabeth Barrios","campus":"Corregidora","active":96,"won":7,"wonOrganic":7,"wonLegacy":0,"winPct":5.1,"lossPct":5.9}],"alerts":[{"level":"red","text":"189 leads en Calificado del ciclo 26-27 sin agendar visita — el cuello del funnel"},{"level":"red","text":"Daniela (Juriquilla), Itzel (Milenio) y Alberto (SMA) cerraron 0 inscripciones esta semana"},{"level":"red","text":"Preparatoria 3 (12vo) sigue con 0 cierres en todo el ciclo — definir si hay cupo abierto o cerrar el grado"},{"level":"yellow","text":"Caída orgánica fuerte: 6 cierres vs 19 en W17 (-68%) — verificar si fue efecto Semana Santa o desaceleración real"},{"level":"yellow","text":"Visitas bajaron a 7 (vs 10 en W17). Sin visitas, no hay inscripciones la próxima semana"},{"level":"yellow","text":"SMA: 17 leads nuevos pero 0 visitas y 0 cierres — Alberto necesita agendar urgentemente"},{"level":"yellow","text":"99 opps en Cita Realizada del ciclo sin avanzar a Pago Perfil — ver post-visita"},{"level":"green","text":"Elizabeth (Corregidora) recuperó: 4 cierres orgánicos tras 0 en W17"}],"priorities":["Drenar Calificado: agendar 30 visitas la próxima semana de las 189 opps abiertas","Alberto (SMA): convertir los 19 leads nuevos en al menos 5 citas agendadas","Itzel y Daniela: revisar pipeline de Cita Realizada (Itzel 8, Daniela 15) — empujar a evaluación o cerrar","Validar con Admisiones si Preparatoria 2 y 3 tienen cupo real abierto, o cerrar de la oferta","Confirmar plan post-visita estructurado: hoy hay 99 opps en Cita Realizada sin avanzar","Investigar caída del lunes-martes en captación: si la pauta paid scaló o si hubo cambio en blasts, validar si W19 mantiene el ritmo de 32+24 leads"],"dataQuality":[{"label":"Leads con fuente identificable","value":"92%","status":"good"},{"label":"Leads con campus asignado","value":"100%","status":"good"},{"label":"Leads con nivel académico (al ingreso)","value":"6%","status":"bad"},{"label":"Wons con grado asignado","value":"99%","status":"good"},{"label":"Registros basura detectados","value":"0","status":"good"},{"label":"Migraciones legacy esta semana","value":"0 (lectura limpia)","status":"good"}],"fastpass":{"open":20,"won":50,"lost":0,"total":71,"byCampus":[{"campus":"Zibatá","open":2,"won":5,"lost":0,"total":7},{"campus":"Juriquilla","open":11,"won":37,"lost":0,"total":49},{"campus":"Corregidora","open":5,"won":3,"lost":0,"total":8},{"campus":"Milenio","open":2,"won":4,"lost":0,"total":6},{"campus":"San Miguel de Allende","open":0,"won":1,"lost":0,"total":1}]},"inscritosPorGrado":{"campuses":["Corregidora","Juriquilla","Milenio","San Miguel de Allende","Zibatá"],"all":[{"grado":"Secundaria 1 (7mo)","count":26},{"grado":"Kinder 1","count":23},{"grado":"Kinder 2","count":20},{"grado":"Primaria 1","count":10},{"grado":"Preparatoria 1 (10mo)","count":10},{"grado":"Maternal","count":6},{"grado":"Kinder 3","count":6},{"grado":"Primaria 5","count":6},{"grado":"Primaria 2","count":6},{"grado":"Primaria 6","count":5},{"grado":"Primaria 4","count":5},{"grado":"Primaria 3","count":4},{"grado":"Secundaria 2 (8vo)","count":4},{"grado":"Secundaria 3 (9no)","count":2},{"grado":"Preparatoria 2 (11vo)","count":1},{"grado":"Sin grado asignado","count":1}],"byCampus":{"Zibatá":[{"grado":"Kinder 1","count":13},{"grado":"Kinder 2","count":11},{"grado":"Secundaria 1 (7mo)","count":9},{"grado":"Preparatoria 1 (10mo)","count":8},{"grado":"Kinder 3","count":5},{"grado":"Primaria 1","count":5},{"grado":"Primaria 3","count":2},{"grado":"Maternal","count":2},{"grado":"Primaria 5","count":2},{"grado":"Secundaria 2 (8vo)","count":2},{"grado":"Primaria 4","count":1},{"grado":"Secundaria 3 (9no)","count":1},{"grado":"Primaria 6","count":1},{"grado":"Preparatoria 2 (11vo)","count":1}],"Juriquilla":[{"grado":"Secundaria 1 (7mo)","count":12},{"grado":"Kinder 1","count":6},{"grado":"Primaria 2","count":5},{"grado":"Kinder 2","count":5},{"grado":"Primaria 4","count":4},{"grado":"Primaria 1","count":4},{"grado":"Primaria 5","count":4},{"grado":"Maternal","count":3},{"grado":"Primaria 6","count":3},{"grado":"Kinder 3","count":1},{"grado":"Primaria 3","count":1},{"grado":"Secundaria 2 (8vo)","count":1},{"grado":"Secundaria 3 (9no)","count":1}],"Milenio":[{"grado":"Secundaria 1 (7mo)","count":3},{"grado":"Kinder 1","count":2},{"grado":"Kinder 2","count":2},{"grado":"Primaria 1","count":1},{"grado":"Primaria 6","count":1},{"grado":"Maternal","count":1},{"grado":"Secundaria 2 (8vo)","count":1},{"grado":"Primaria 2","count":1}],"San Miguel de Allende":[{"grado":"Secundaria 1 (7mo)","count":1},{"grado":"Kinder 2","count":1},{"grado":"Primaria 3","count":1}],"Corregidora":[{"grado":"Preparatoria 1 (10mo)","count":2},{"grado":"Kinder 1","count":2},{"grado":"Kinder 2","count":1},{"grado":"Secundaria 1 (7mo)","count":1},{"grado":"Sin grado asignado","count":1}]}},"weeklyByGrade":{"weeks":["W15","W16","W17","W18"],"weekRanges":["Abr 6–12","Abr 13–19","Abr 20–26","Abr 27 – May 3"],"grades":[{"grade":"Maternal","level":"Maternal","values":[{"organic":0,"legacy":1},{"organic":0,"legacy":0},{"organic":2,"legacy":2},{"organic":0,"legacy":0}]},{"grade":"Kinder 1","level":"Kinder","values":[{"organic":1,"legacy":6},{"organic":4,"legacy":1},{"organic":3,"legacy":5},{"organic":1,"legacy":0}]},{"grade":"Kinder 2","level":"Kinder","values":[{"organic":1,"legacy":5},{"organic":4,"legacy":0},{"organic":2,"legacy":3},{"organic":1,"legacy":0}]},{"grade":"Kinder 3","level":"Kinder","values":[{"organic":0,"legacy":4},{"organic":0,"legacy":0},{"organic":1,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Primaria 1","level":"Primaria","values":[{"organic":0,"legacy":3},{"organic":2,"legacy":0},{"organic":0,"legacy":4},{"organic":0,"legacy":0}]},{"grade":"Primaria 2","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":2,"legacy":2},{"organic":0,"legacy":0}]},{"grade":"Primaria 3","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":3,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Primaria 4","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":2,"legacy":3},{"organic":0,"legacy":0}]},{"grade":"Primaria 5","level":"Primaria","values":[{"organic":0,"legacy":2},{"organic":1,"legacy":0},{"organic":0,"legacy":3},{"organic":0,"legacy":0}]},{"grade":"Primaria 6","level":"Primaria","values":[{"organic":0,"legacy":1},{"organic":1,"legacy":0},{"organic":0,"legacy":3},{"organic":0,"legacy":0}]},{"grade":"Secundaria 1 (7mo)","level":"Secundaria","values":[{"organic":0,"legacy":5},{"organic":1,"legacy":0},{"organic":3,"legacy":7},{"organic":2,"legacy":0}]},{"grade":"Secundaria 2 (8vo)","level":"Secundaria","values":[{"organic":0,"legacy":1},{"organic":0,"legacy":0},{"organic":0,"legacy":2},{"organic":0,"legacy":0}]},{"grade":"Secundaria 3 (9no)","level":"Secundaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":2},{"organic":0,"legacy":0}]},{"grade":"Preparatoria 1 (10mo)","level":"Preparatoria","values":[{"organic":0,"legacy":5},{"organic":0,"legacy":0},{"organic":1,"legacy":1},{"organic":1,"legacy":0}]},{"grade":"Preparatoria 2 (11vo)","level":"Preparatoria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Preparatoria 3 (12vo)","level":"Preparatoria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Sin grado asignado","level":"Sin dato","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0}]}],"weekTotals":[{"organic":2,"legacy":33},{"organic":13,"legacy":1},{"organic":19,"legacy":40},{"organic":6,"legacy":0}],"byCampus":{"Zibatá":{"grades":[{"grade":"Maternal","level":"Maternal","values":[{"organic":0,"legacy":1},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Kinder 1","level":"Kinder","values":[{"organic":1,"legacy":6},{"organic":0,"legacy":1},{"organic":3,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Kinder 2","level":"Kinder","values":[{"organic":1,"legacy":5},{"organic":1,"legacy":0},{"organic":0,"legacy":1},{"organic":1,"legacy":0}]},{"grade":"Kinder 3","level":"Kinder","values":[{"organic":0,"legacy":4},{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Primaria 1","level":"Primaria","values":[{"organic":0,"legacy":3},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Primaria 3","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":2,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Primaria 4","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Primaria 5","level":"Primaria","values":[{"organic":0,"legacy":2},{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Primaria 6","level":"Primaria","values":[{"organic":0,"legacy":1},{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Secundaria 1 (7mo)","level":"Secundaria","values":[{"organic":0,"legacy":5},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Secundaria 2 (8vo)","level":"Secundaria","values":[{"organic":0,"legacy":1},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Secundaria 3 (9no)","level":"Secundaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Preparatoria 1 (10mo)","level":"Preparatoria","values":[{"organic":0,"legacy":5},{"organic":0,"legacy":0},{"organic":1,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Preparatoria 2 (11vo)","level":"Preparatoria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]}],"weekTotals":[{"organic":2,"legacy":33},{"organic":1,"legacy":1},{"organic":8,"legacy":9},{"organic":1,"legacy":0}]},"Juriquilla":{"grades":[{"grade":"Maternal","level":"Maternal","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Kinder 1","level":"Kinder","values":[{"organic":0,"legacy":0},{"organic":2,"legacy":0},{"organic":0,"legacy":4},{"organic":0,"legacy":0}]},{"grade":"Kinder 2","level":"Kinder","values":[{"organic":0,"legacy":0},{"organic":2,"legacy":0},{"organic":0,"legacy":2},{"organic":0,"legacy":0}]},{"grade":"Kinder 3","level":"Kinder","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Primaria 1","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":3},{"organic":0,"legacy":0}]},{"grade":"Primaria 2","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":2,"legacy":2},{"organic":0,"legacy":0}]},{"grade":"Primaria 3","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Primaria 4","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":3},{"organic":0,"legacy":0}]},{"grade":"Primaria 5","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":3},{"organic":0,"legacy":0}]},{"grade":"Primaria 6","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":3},{"organic":0,"legacy":0}]},{"grade":"Secundaria 1 (7mo)","level":"Secundaria","values":[{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":2,"legacy":6},{"organic":1,"legacy":0}]},{"grade":"Secundaria 2 (8vo)","level":"Secundaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]},{"grade":"Secundaria 3 (9no)","level":"Secundaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":1},{"organic":0,"legacy":0}]}],"weekTotals":[{"organic":0,"legacy":0},{"organic":7,"legacy":0},{"organic":6,"legacy":31},{"organic":1,"legacy":0}]},"Milenio":{"grades":[{"grade":"Maternal","level":"Maternal","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Kinder 1","level":"Kinder","values":[{"organic":0,"legacy":0},{"organic":2,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Kinder 2","level":"Kinder","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Primaria 1","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Primaria 6","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0}]}],"weekTotals":[{"organic":0,"legacy":0},{"organic":4,"legacy":0},{"organic":2,"legacy":0},{"organic":0,"legacy":0}]},"San Miguel de Allende":{"grades":[{"grade":"Kinder 2","level":"Kinder","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Primaria 3","level":"Primaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Secundaria 1 (7mo)","level":"Secundaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0}]}],"weekTotals":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":3,"legacy":0},{"organic":0,"legacy":0}]},"Corregidora":{"grades":[{"grade":"Kinder 1","level":"Kinder","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0}]},{"grade":"Kinder 2","level":"Kinder","values":[{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0}]},{"grade":"Secundaria 1 (7mo)","level":"Secundaria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0}]},{"grade":"Preparatoria 1 (10mo)","level":"Preparatoria","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0}]},{"grade":"Sin grado asignado","level":"Sin dato","values":[{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":0,"legacy":0},{"organic":1,"legacy":0}]}],"weekTotals":[{"organic":0,"legacy":0},{"organic":1,"legacy":0},{"organic":0,"legacy":0},{"organic":4,"legacy":0}]}}},"gradesWithoutMovement":[{"grade":"Preparatoria 3 (12vo)","level":"Preparatoria","totalLast4Weeks":0,"lastWeekWithClose":null},{"grade":"Preparatoria 2 (11vo)","level":"Preparatoria","totalLast4Weeks":1,"lastWeekWithClose":"W17"},{"grade":"Secundaria 3 (9no)","level":"Secundaria","totalLast4Weeks":2,"lastWeekWithClose":"W17"}],"capSections":[]};
+
+function switchGradoTab(tabId) {
+  document.querySelectorAll('#gradoTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+  document.querySelectorAll('#gradoTabContents .tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
+}
+
+function switchWeeklyGradeTab(tabId) {
+  document.querySelectorAll('#weeklyGradeTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+  document.querySelectorAll('#weeklyGradeTabContents .tab-content').forEach(c => c.classList.toggle('active', c.id === tabId));
+}
+
+if (!D) { document.body.innerHTML = '<div style="padding:40px;text-align:center;color:#999;">No report data loaded.</div>'; }
+else { render(D); }
+
+// Safe value helper — never show null/undefined
+function v(val, fallback) { return (val === null || val === undefined || val === 'null' || val === 'undefined') ? (fallback !== undefined ? fallback : '—') : val; }
+
+function render(d) {
+  // Detect CAP-only report: has capSections but no general data
+  const isCapOnly = d.capSections && d.capSections.length > 0 && (!d.pipeline || d.pipeline.length === 0) && (!d.sources || d.sources.length === 0);
+  if (isCapOnly) {
+    // Hide ALL general sections — only show header + CAP sections
+    document.querySelectorAll('.card, .meta-bar, .kpi-grid').forEach(el => el.style.display = 'none');
+    // Show only the capSections container
+    document.getElementById('capSections').style.display = '';
+  }
+
+  // Meta
+  document.getElementById('weekLabel').textContent = v(d.weekLabel, '');
+  document.getElementById('metaWeek').textContent = v(d.weekRange, '');
+  document.getElementById('metaDate').textContent = v(d.extractedAt, '');
+  document.getElementById('summary').innerHTML = v(d.summary, '');
+
+  // KPIs
+  const kpiGrid = document.getElementById('kpiGrid');
+  (d.kpis || []).forEach(k => {
+    const val = v(k.value, '—');
+    const delta = k.delta;
+    const cls = delta > 0 ? 'delta-up' : delta < 0 ? 'delta-down' : 'delta-neutral';
+    const sign = delta > 0 ? '+' : '';
+    kpiGrid.innerHTML += `<div class="kpi"><div class="num">${val}</div><div class="lbl">${v(k.label)}</div>${delta !== null && delta !== undefined ? `<div class="delta ${cls}">${sign}${delta} vs sem ant</div>` : ''}</div>`;
+  });
+
+  // Leads by day chart
+  if (d.leadsByDay) {
+    new Chart(document.getElementById('leadsChart'), {
+      type: 'bar', data: { labels: d.leadsByDay.labels || [], datasets: [{ label: 'Leads', data: (d.leadsByDay.values || []).map(x => x || 0), backgroundColor: '#701321cc', borderRadius: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+  }
+
+  // Sources
+  if (d.sources && d.sources.length > 0) {
+    const tbody = document.querySelector('#sourcesTable tbody');
+    const total = d.sources.reduce((s,x) => s + (x.count || 0), 0) || 1;
+    d.sources.forEach(s => { tbody.innerHTML += `<tr><td>${v(s.name)}</td><td class="text-right">${v(s.count, 0)}</td><td class="text-right">${Math.round((s.count||0)/total*100)}%</td></tr>`; });
+    new Chart(document.getElementById('sourcesChart'), {
+      type: 'doughnut', data: { labels: d.sources.map(s => v(s.name)), datasets: [{ data: d.sources.map(s => s.count || 0), backgroundColor: ['#701321','#8e1a2a','#b38e1d','#d4af37','#F4E4C1','#4d0d17','#a0522d','#cd853f'] }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }
+    });
+  }
+
+  // Pipeline
+  if (d.pipeline) {
+    const tbody = document.querySelector('#pipelineTable tbody');
+    const totalOpen = d.pipeline.reduce((s,p) => s + (p.open||0), 0) || 1;
+    d.pipeline.forEach(p => { tbody.innerHTML += `<tr><td>${v(p.stage)}</td><td class="text-right">${v(p.total, 0)}</td><td class="text-right">${v(p.open, 0)}</td><td class="text-right">${Math.round((p.open||0)/totalOpen*100)}%</td></tr>`; });
+    if (d.pipelineStatus) document.getElementById('pipelineStatus').innerHTML = d.pipelineStatus;
+  }
+
+  // Campus
+  if (d.campuses) {
+    const grid = document.getElementById('campusGrid');
+    d.campuses.forEach(c => {
+      grid.innerHTML += `<div class="campus-card"><h3>📍 ${v(c.name)}</h3>
+        ${(c.stats||[]).map(s => `<div class="campus-stat"><span>${v(s.label)}</span><span><strong>${v(s.value, '—')}</strong></span></div>`).join('')}
+        ${c.notes ? `<p style="margin-top:8px;font-size:.8rem;color:#666;">${c.notes}</p>` : ''}
+      </div>`;
+    });
+  }
+
+  // CAP table
+  if (d.caps) {
+    const tbody = document.querySelector('#capTable tbody');
+    d.caps.forEach(c => { tbody.innerHTML += `<tr><td>${v(c.name)}</td><td>${v(c.campus)}</td><td class="text-right">${v(c.active, 0)}</td><td class="text-right">${v(c.won, 0)}</td><td class="text-right">${v(c.winPct, '—')}%</td><td class="text-right">${v(c.lossPct, '—')}%</td></tr>`; });
+  }
+
+  // Alerts
+  if (d.alerts) {
+    const container = document.getElementById('alertsContainer');
+    d.alerts.forEach(a => {
+      const cls = a.level === 'red' ? 'alert-red' : a.level === 'yellow' ? 'alert-yellow' : 'alert-green';
+      const icon = a.level === 'red' ? '🔴' : a.level === 'yellow' ? '⚠️' : '✅';
+      container.innerHTML += `<div class="alert ${cls}">${icon} ${a.text}</div>`;
+    });
+  }
+
+  // Priorities
+  if (d.priorities) {
+    const ol = document.getElementById('prioritiesList');
+    d.priorities.forEach(p => { ol.innerHTML += `<li><strong>${p}</strong></li>`; });
+  }
+
+  // Fastpass (styled with color-coded KPIs)
+  if (d.fastpass && (d.fastpass.total || d.fastpass.byCampus)) {
+    document.getElementById('fastpassCard').style.display = '';
+    const fp = d.fastpass;
+    const fpKpis = document.getElementById('fastpassKpis');
+    fpKpis.innerHTML = `
+      <div class="kpi"><div class="num">${v(fp.open, 0)}</div><div class="lbl">Abiertos</div></div>
+      <div class="kpi" style="background:#e8f5e9;"><div class="num" style="color:#2e7d32;">${v(fp.won, 0)}</div><div class="lbl">Inscritos</div></div>
+      <div class="kpi"><div class="num">${v(fp.lost, 0)}</div><div class="lbl">Perdidos</div></div>
+      <div class="kpi" style="background:var(--color-primario);"><div class="num" style="color:#fff;">${v(fp.total, 0)}</div><div class="lbl" style="color:#ffd;">Total Fastpass</div></div>
+    `;
+    const fpBody = document.querySelector('#fastpassTable tbody');
+    (fp.byCampus || []).forEach(c => {
+      fpBody.innerHTML += `<tr><td>${v(c.campus)}</td><td class="text-right">${v(c.open, 0)}</td><td class="text-right">${v(c.won, 0)}</td><td class="text-right">${v(c.lost, 0)}</td><td class="text-right"><strong>${v(c.total, 0)}</strong></td></tr>`;
+    });
+    if (fp.note) document.getElementById('fastpassNote').innerHTML = fp.note;
+  }
+
+  // Evolución Semanal por Grado (heatmap matrix, organic + legacy split, dormant flag)
+  if (d.weeklyByGrade && d.weeklyByGrade.weeks && d.weeklyByGrade.grades && d.weeklyByGrade.grades.length) {
+    document.getElementById('weeklyByGradeCard').style.display = '';
+    const wg = d.weeklyByGrade;
+    const tabsEl = document.getElementById('weeklyGradeTabs');
+    const contentsEl = document.getElementById('weeklyGradeTabContents');
+    const campusList = ['Todos', ...Object.keys(wg.byCampus || {})];
+
+    function renderMatrix(rows, weekTotals, weeks, weekRanges, idx, campus) {
+      const tabId = 'weeklyGradeTab_' + idx;
+      tabsEl.innerHTML += `<div class="tab ${idx===0?'active':''}" data-tab="${tabId}" onclick="switchWeeklyGradeTab('${tabId}')">${campus}</div>`;
+      let cellMax = 0;
+      (rows || []).forEach(r => (r.values || []).forEach(c => {
+        const t = (c.organic || 0) + (c.legacy || 0);
+        if (t > cellMax) cellMax = t;
+      }));
+      cellMax = Math.max(cellMax, 1);
+      const headRow = `<tr><th style="text-align:left;">Grado</th>${weeks.map((w,i) => `<th>${w}<div style="font-weight:400;font-size:.65rem;opacity:.85;">${(weekRanges && weekRanges[i]) || ''}</div></th>`).join('')}</tr>`;
+      const bodyRows = (rows || []).map(r => {
+        const tds = (r.values || []).map(c => {
+          const o = c.organic || 0, l = c.legacy || 0, t = o + l;
+          if (t === 0) return `<td style="background:#fafafa;color:#bbb;">0</td>`;
+          const intensity = t / cellMax;
+          const lightness = Math.round(94 - intensity * 60);
+          const bg = `hsl(351, 70%, ${lightness}%)`;
+          const fg = lightness < 55 ? '#fff' : 'var(--texto-oscuro)';
+          const cellInner = l === 0 ? `${t}` : `${t}<span class="legacy-chip"> (${o}o+${l}l)</span>`;
+          return `<td style="background:${bg};color:${fg};">${cellInner}</td>`;
+        }).join('');
+        return `<tr><td class="grade-name">${r.grade}</td>${tds}</tr>`;
+      }).join('');
+      const totalCells = (weekTotals || []).map(c => {
+        const o = c.organic || 0, l = c.legacy || 0, t = o + l;
+        return l === 0 ? `<td>${t}</td>` : `<td>${t}<span class="legacy-chip"> (${o}o+${l}l)</span></td>`;
+      }).join('');
+      const totalRow = `<tr class="row-total"><td class="grade-name">TOTAL SEMANA</td>${totalCells}</tr>`;
+      contentsEl.innerHTML += `<div class="tab-content ${idx===0?'active':''}" id="${tabId}"><table class="weekly-grade-table"><thead>${headRow}</thead><tbody>${bodyRows}${totalRow}</tbody></table></div>`;
+    }
+
+    campusList.forEach((campus, idx) => {
+      if (campus === 'Todos') {
+        renderMatrix(wg.grades, wg.weekTotals, wg.weeks, wg.weekRanges, idx, 'Todos');
+      } else {
+        const c = (wg.byCampus || {})[campus] || {};
+        renderMatrix(c.grades, c.weekTotals, wg.weeks, wg.weekRanges, idx, campus);
+      }
+    });
+
+    const dormantEl = document.getElementById('dormantSection');
+    const dormant = d.gradesWithoutMovement || [];
+    if (dormant.length === 0) {
+      dormantEl.innerHTML = `<h4>🚨 Grados sin movimiento</h4><div class="dormant-empty">Todos los grados tuvieron al menos un cierre en las últimas 4 semanas.</div>`;
+    } else {
+      const chips = dormant.map(g => {
+        const lastTxt = g.lastWeekWithClose ? ` · último: ${g.lastWeekWithClose}` : ' · sin cierres';
+        return `<div class="dormant-chip">🚨 ${g.grade} — ${g.totalLast4Weeks} cierre${g.totalLast4Weeks === 1 ? '' : 's'}${lastTxt}</div>`;
+      }).join('');
+      dormantEl.innerHTML = `<h4>🚨 Grados sin movimiento (≤2 cierres en últimas 4 semanas)</h4><div class="dormant-chips">${chips}</div><p class="muted" style="margin-top:8px;font-size:.75rem;color:#888;font-style:italic;">Candidatos para revisión estratégica: ¿está cerrado el ciclo en estos grados, o necesitamos abrir cupo / re-activar leads?</p>`;
+    }
+  }
+
+  // Acumulado del Ciclo — heading interpolation
+  if (d.weekLabel) {
+    const m = String(d.weekLabel).match(/W\d+/);
+    if (m) {
+      const h = document.getElementById('acumuladoCicloHeading');
+      if (h) h.innerHTML = `🎓 Acumulado del Ciclo (al cierre de ${m[0]})`;
+    }
+  }
+
+  // Inscritos por Grado (tabs + color-coded horizontal bars + nivel summary)
+  if (d.inscritosPorGrado && d.inscritosPorGrado.all && d.inscritosPorGrado.all.length) {
+    document.getElementById('inscritosPorGradoCard').style.display = '';
+    const gd = d.inscritosPorGrado;
+    const campusNames = ['Todos', ...(gd.campuses || [])];
+    const tabsEl = document.getElementById('gradoTabs');
+    const contentsEl = document.getElementById('gradoTabContents');
+
+    const nivelColors = { Maternal:'maternal', Kinder:'kinder', Primaria:'primaria', Secundaria:'secundaria', Preparatoria:'preparatoria', 'Sin dato':'sindata' };
+    const nivelDots = { Maternal:'#e8b4bc', Kinder:'#d4af37', Primaria:'#701321', Secundaria:'#8e1a2a', Preparatoria:'#4d0d17', 'Sin dato':'#ccc' };
+
+    const ALL_GRADES = [
+      'Maternal','Kinder 1','Kinder 2','Kinder 3',
+      'Primaria 1','Primaria 2','Primaria 3','Primaria 4','Primaria 5','Primaria 6',
+      'Secundaria 1 (7mo)','Secundaria 2 (8vo)','Secundaria 3 (9no)',
+      'Preparatoria 1 (10mo)','Preparatoria 2 (11vo)','Preparatoria 3 (12vo)',
+      'Sin grado asignado'
+    ];
+
+    function getNivel(grado) {
+      if (!grado || grado === 'Sin dato' || grado === 'Sin grado asignado') return 'Sin dato';
+      if (grado.startsWith('Maternal')) return 'Maternal';
+      if (grado.startsWith('Kinder')) return 'Kinder';
+      if (grado.startsWith('Primaria')) return 'Primaria';
+      if (grado.startsWith('Secundaria')) return 'Secundaria';
+      if (grado.startsWith('Preparatoria')) return 'Preparatoria';
+      return 'Sin dato';
+    }
+
+    function normalizeGrades(gradeData) {
+      const map = {};
+      (gradeData || []).forEach(g => { map[g.grado] = (g.count || 0); });
+      return ALL_GRADES.map(g => ({ grado: g, count: map[g] || 0 }));
+    }
+
+    campusNames.forEach((campus, idx) => {
+      const tabId = 'gradoTab_' + idx;
+      tabsEl.innerHTML += `<div class="tab ${idx===0?'active':''}" data-tab="${tabId}" onclick="switchGradoTab('${tabId}')">${campus}</div>`;
+
+      const rawGrades = campus === 'Todos' ? (gd.all || []) : (gd.byCampus?.[campus] || []);
+      const grades = normalizeGrades(rawGrades);
+      const maxCount = Math.max(1, ...grades.map(g => g.count || 0));
+      const total = grades.reduce((s, g) => s + (g.count || 0), 0);
+
+      let html = `<div class="tab-content ${idx===0?'active':''}" id="${tabId}">`;
+      grades.forEach(g => {
+        const nivel = getNivel(g.grado);
+        const pct = Math.round((g.count||0)/maxCount*100);
+        html += `<div class="grade-bar">
+          <div class="grade-label">${v(g.grado, 'Sin dato')}</div>
+          <div class="grade-fill-wrap"><div class="grade-fill ${nivelColors[nivel]||'sindata'}" style="width:${pct}%"></div></div>
+          <div class="grade-count">${g.count||0}</div>
+        </div>`;
+      });
+      html += `<div style="text-align:right;font-size:.78rem;color:#888;margin-top:6px;">Total: <strong>${total}</strong> inscritos</div>`;
+      html += '</div>';
+      contentsEl.innerHTML += html;
+    });
+
+    const allGrades = gd.all || [];
+    const nivelTotals = {};
+    allGrades.forEach(g => {
+      const nivel = getNivel(g.grado);
+      nivelTotals[nivel] = (nivelTotals[nivel] || 0) + (g.count || 0);
+    });
+    const summaryEl = document.getElementById('nivelSummary');
+    Object.entries(nivelTotals).sort((a,b) => b[1]-a[1]).forEach(([nivel, count]) => {
+      summaryEl.innerHTML += `<div class="nivel-chip"><div class="nivel-dot" style="background:${nivelDots[nivel]||'#ccc'}"></div>${nivel}: <strong>${count}</strong></div>`;
+    });
+  }
+
+  // Data quality
+  if (d.dataQuality) {
+    const tbody = document.querySelector('#qualityTable tbody');
+    d.dataQuality.forEach(q => {
+      const icon = q.status === 'good' ? '✅' : q.status === 'warn' ? '⚠️' : '🔴';
+      tbody.innerHTML += `<tr><td>${v(q.label)}</td><td class="text-right">${v(q.value)}</td><td class="text-center">${icon}</td></tr>`;
+    });
+  }
+
+  // Individual CAP sections
+  if (d.capSections && d.capSections.length > 0) {
+    const container = document.getElementById('capSections');
+    container.innerHTML = '<div class="card fade-in d5"><div class="card-head"><h2>Secciones Individuales CAP</h2></div><div class="card-body">' +
+      d.capSections.map(cap => `
+        <div class="cap-section">
+          <div class="cap-header"><h3>${v(cap.name)}</h3><span class="campus-tag">📍 ${v(cap.campus)}</span></div>
+          <table style="margin-bottom:12px;"><thead><tr><th>Métrica</th><th class="text-right">Sem Ant</th><th class="text-right">Esta Sem</th><th class="text-right">Δ</th></tr></thead><tbody>
+            ${(cap.weeklyMetrics||[]).map(m => `<tr><td>${v(m.label)}</td><td class="text-right">${v(m.prev)}</td><td class="text-right">${v(m.current)}</td><td class="text-right">${v(m.delta)}</td></tr>`).join('')}
+          </tbody></table>
+          ${(cap.conversations||[]).map(conv => `
+            <div class="conv-review">
+              <div class="conv-name">${v(conv.leadName)}</div>
+              <div class="conv-meta">Etapa: ${v(conv.stage)} · ${v(conv.messageCount, 0)} mensajes (${v(conv.outbound, 0)} salientes / ${v(conv.inbound, 0)} entrantes)</div>
+              <p style="font-size:.82rem;margin:6px 0;">${v(conv.context, '')}</p>
+              <blockquote>${v(conv.highlight, 'Sin extracto disponible.')}</blockquote>
+            </div>
+          `).join('')}
+          ${cap.strengths ? `<h4 style="font-size:.85rem;color:#2e7d32;margin:12px 0 6px;">Lo Que Se Está Haciendo Bien</h4><ul style="padding-left:18px;font-size:.82rem;">${cap.strengths.map(s=>`<li>${s}</li>`).join('')}</ul>` : ''}
+          ${cap.improvements ? `<h4 style="font-size:.85rem;color:var(--color-primario);margin:12px 0 6px;">Oportunidades de Mejora</h4><ul style="padding-left:18px;font-size:.82rem;">${cap.improvements.map(s=>`<li>${s}</li>`).join('')}</ul>` : ''}
+          ${cap.focus ? `<h4 style="font-size:.85rem;color:var(--color-oro);margin:12px 0 6px;">Foco Próxima Semana</h4><p style="font-size:.82rem;">${cap.focus}</p>` : ''}
+        </div>
+      `).join('') +
+    '</div></div>';
+  }
+}
+</script>
+</body>
+</html>
